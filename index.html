@@ -5589,4 +5589,39 @@ body.vs-wf-focused #vs-wf-settings #ws-layout-controls{display:flex!important;fl
 @media(max-width:800px){#vs-eval-diagnostics{left:12px;right:12px;width:auto}}
 #vs-eval-results .vs-eval-entry.pass{border-left:3px solid #2d8a74;padding-left:8px}#vs-eval-results .vs-eval-entry.not_tested{border-left:3px solid #9b8e76;padding-left:8px}
 </style>
+
+<style id="vs-unified-footer-fix">
+/* One footer, three deliberately sized functional zones. No fixed badges over commands. */
+body{min-height:0!important;overflow:hidden!important;grid-template-rows:minmax(46px,auto) minmax(0,1fr) minmax(38px,auto)!important}
+#C{position:relative!important;box-sizing:border-box!important;min-height:38px!important;max-height:74px!important;display:flex!important;align-items:center!important;gap:8px!important;flex-wrap:nowrap!important;min-width:0!important;padding:5px 9px!important;overflow-x:auto!important;overflow-y:hidden!important;scrollbar-width:thin;z-index:100!important}
+#C #hint{flex:1 1 160px!important;min-width:80px!important;max-width:none!important;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#C #cmd{flex:0 1 260px!important;width:clamp(115px,22vw,260px)!important;min-width:115px!important;max-width:260px!important}
+#C #xy{flex:0 0 auto!important;white-space:nowrap!important}
+#C #vs-footer-aux{display:flex!important;align-items:center!important;gap:7px!important;flex:0 1 auto!important;min-width:0!important;margin-left:auto!important;max-width:min(47vw,560px)!important}
+#C #vs-canvas-status,#C #vs-progressive-controls{position:static!important;inset:auto!important;top:auto!important;left:auto!important;right:auto!important;bottom:auto!important;transform:none!important;margin:0!important;box-shadow:none!important;max-width:none!important;min-width:0!important;border-radius:4px!important;padding:3px 6px!important;flex:0 1 auto!important;z-index:auto!important;white-space:nowrap!important;box-sizing:border-box!important}
+#C #vs-canvas-status{max-width:180px!important;overflow:hidden!important;text-overflow:ellipsis!important}
+#C #vs-progressive-controls{display:flex!important;align-items:center!important;gap:4px!important;overflow:hidden!important}
+#C #vs-progressive-state{min-width:0!important;max-width:140px!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+#C #vs-progressive-controls button{padding:3px 6px!important;min-height:25px!important;flex:0 0 auto!important}
+#C #vs-footer-aux>*[hidden]{display:none!important}
+@media(max-width:950px){#C #hint{flex:0 1 95px!important}#C #vs-canvas-status{display:none!important}#C #vs-progressive-state{max-width:65px!important}#C #vs-footer-aux{max-width:48vw!important}}
+@media(max-width:650px){#C{gap:5px!important;padding:4px 5px!important}#C #hint{display:none!important}#C #cmd{flex:0 1 140px!important;min-width:100px!important}#C #vs-progressive-state{display:none!important}#C #vs-footer-aux{max-width:none!important}#C #vs-progressive-controls{padding:2px!important}#C #vs-progressive-controls button{padding:2px 5px!important}}
+/* Keep small side launchers above, not on, the footer. */
+#vs-group-open{bottom:calc(var(--vs-footer-height,46px) + 10px)!important}
+</style>
+<script id="vs-unified-footer-runtime">
+(function(){'use strict';
+function unifyFooter(){
+ const foot=document.getElementById('C'); if(!foot)return;
+ let aux=document.getElementById('vs-footer-aux');
+ if(!aux){aux=document.createElement('div');aux.id='vs-footer-aux';aux.setAttribute('aria-label','Viewport status and recovery');foot.appendChild(aux)}
+ for(const id of ['vs-canvas-status','vs-progressive-controls']){let el=document.getElementById(id);if(el&&el.parentElement!==aux)aux.appendChild(el)}
+ // Size is used by the inspector and section panels as their bottom inset.
+ const h=Math.ceil(foot.getBoundingClientRect().height)+6;
+ if(h>0)document.documentElement.style.setProperty('--vs-footer-height',h+'px');
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',unifyFooter,{once:true});else unifyFooter();
+window.addEventListener('resize',()=>{const el=document.getElementById('C');if(el)document.documentElement.style.setProperty('--vs-footer-height',Math.ceil(el.getBoundingClientRect().height+6)+'px')},{passive:true});
+})();
+</script>
 </body></html>

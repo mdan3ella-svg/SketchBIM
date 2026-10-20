@@ -272,6 +272,30 @@ body.vs-zoom-compact #R #tabs button{flex:1 1 27%;white-space:normal!important}
 #vs-production{position:fixed;right:16px;top:76px;width:min(500px,calc(100vw - 32px));max-height:calc(100dvh - 96px);z-index:214748200;display:flex;flex-direction:column;background:#fff;color:#173440;border:1px solid #aec7cd;border-radius:13px;box-shadow:0 18px 60px #11242c55;font:13px/1.5 system-ui,'Segoe UI',sans-serif;overflow:hidden}
 #vs-production[hidden]{display:none!important}#vs-production *{box-sizing:border-box}#vs-production header{padding:14px 16px;background:#123945;color:#fff;display:flex;align-items:center;justify-content:space-between;gap:10px}#vs-production header strong{font-size:15px;letter-spacing:.02em}#vs-production button{cursor:pointer;border:1px solid #b9ccd1;background:#f6fbfc;color:#163f49;font:600 12px system-ui;border-radius:7px;padding:8px 10px;min-height:34px}#vs-production button:focus-visible{outline:3px solid #11849a;outline-offset:1px}#vs-production button:hover{background:#e1f4f7}#vs-production .vsp-close{background:#ffffff22;color:white;border-color:#ffffff66}#vs-production .vsp-body{padding:14px 16px;overflow:auto;min-height:0;overscroll-behavior:contain}#vs-production .vsp-actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:10px 0}#vs-production .vsp-actions button{min-width:0;white-space:normal}#vs-production .vsp-actions button.on{background:#0b7287;color:white}#vs-production .vsp-section{margin:12px 0 6px;font-weight:750;color:#173b45}#vs-production .vsp-status{background:#edf4f6;padding:10px;border-radius:8px;white-space:pre-wrap;overflow-wrap:anywhere}#vs-production .vsp-results{max-height:190px;overflow:auto;border:1px solid #d0e0e3;border-radius:7px;padding:7px;margin-top:8px}#vs-production .vsp-results div{padding:5px 3px;border-bottom:1px solid #e6eeee}#vs-production .vsp-results div:last-child{border:0}#vs-production .vsp-muted{color:#536972;font-size:12px}#vs-production footer{border-top:1px solid #e0e9eb;padding:10px 16px;display:flex;flex-wrap:wrap;gap:7px}#vs-production .vsp-danger{color:#9a2d1c}
 @media(max-width:760px){#vs-production{inset:8px;width:auto;max-height:none;border-radius:9px}#vs-production .vsp-actions{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-height:520px){#vs-production{top:8px;max-height:calc(100dvh - 16px)}}
+</style><style id="vs-sec-css">
+#vs-sec-open{position:fixed;top:54px;right:310px;z-index:3100;background:#124a5b;color:#fff;border:1px solid #407b86;padding:8px 13px;border-radius:7px;font:700 12px system-ui;cursor:pointer}#vs-sec-open:hover{background:#056b80}
+#vs-sec-panel{position:fixed;z-index:4100;right:18px;top:94px;width:min(410px,calc(100vw - 24px));max-height:calc(100dvh - 115px);overflow:auto;background:#f9fbfc;color:#17333d;box-shadow:0 18px 70px #172c3770;border:1px solid #a7bec7;border-radius:12px;padding:15px;font:13px system-ui;box-sizing:border-box}#vs-sec-panel[hidden],#vs-sec-view[hidden]{display:none!important}#vs-sec-panel h2{font:700 18px system-ui;margin:0 0 9px}#vs-sec-panel label{display:block;margin:8px 0 3px;font-weight:650}#vs-sec-panel input,#vs-sec-panel select{width:100%;min-width:0;box-sizing:border-box;padding:7px;border:1px solid #afc3cb;border-radius:5px;color:#142c35;background:white;font:13px system-ui}#vs-sec-panel button,#vs-sec-view button{border:1px solid #a5bdc4;background:#e9f1f3;color:#153640;border-radius:6px;padding:7px 10px;cursor:pointer;font:650 12px system-ui}#vs-sec-panel button:hover,#vs-sec-view button:hover{background:#d5ebef}#vs-sec-panel button:focus-visible,#vs-sec-view button:focus-visible{outline:3px solid #007f9a;outline-offset:2px}.vs-sec-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}.vs-sec-actions .primary{background:#155565;color:#fff}.vs-sec-msg{min-height:18px;font-size:12px;color:#355964;margin-top:8px}#vs-sec-view{position:fixed;z-index:4400;inset:3vh 3vw;background:#fff;color:#192b34;border:1px solid #b4c3c8;box-shadow:0 20px 90px #001b2b8a;border-radius:10px;overflow:auto;padding:16px;box-sizing:border-box}#vs-sec-svg{width:100%;height:min(75vh,730px);overflow:auto;background:#fff;border:1px solid #d5dcdf;margin-top:10px}#vs-sec-svg svg{width:100%;height:100%;object-fit:contain}#vs-sec-overlay{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:9}#vs-sec-panel .mini{font-size:11px;color:#516d78}#vs-sec-panel .vs-sec-row{display:grid;grid-template-columns:1fr 1fr;gap:9px}@media(max-width:1100px){#vs-sec-open{right:12px;top:58px}}@media(max-width:650px){#vs-sec-open{top:96px;right:8px}#vs-sec-panel{top:130px;right:6px;max-height:calc(100dvh - 145px)}#vs-sec-view{inset:1vh 1vw}}
+@media print{body>*{display:none!important}#vs-sec-view{display:block!important;position:static!important;inset:auto!important;box-shadow:none!important;border:0!important;overflow:visible!important;padding:0!important}#vs-sec-view .vs-sec-actions{display:none!important}#vs-sec-svg{width:100%!important;height:auto!important;border:0!important}#vs-sec-svg svg{width:100%!important;height:auto!important} }
+</style><style id="vs-final-workflow-layout">
+/* Final unified command strip and docked section editor — avoid fixed floating control */
+#T{max-height:none!important;min-height:0!important;overflow:visible!important;display:flex!important;flex-wrap:wrap!important;align-content:flex-start!important;gap:6px!important;padding:7px 10px!important;position:relative!important;z-index:30!important}
+#fileMenuControl{order:-200!important;position:relative!important;display:inline-flex!important;flex:0 0 auto!important;visibility:visible!important;pointer-events:auto!important}
+#fileMenuButton{min-width:74px!important;min-height:36px!important;font-size:13px!important;background:#176778!important;color:white!important}
+#fileMenuPopup{position:absolute!important;top:calc(100% + 5px)!important;left:0!important;z-index:2147482800!important;max-height:min(65dvh,540px)!important;overflow:auto!important;color:#173842!important;background:white!important;box-shadow:0 15px 40px #001b2740!important}
+#vs-quickfiles{order:-199;display:flex;gap:4px;flex-wrap:wrap;align-items:center;flex:none}
+#vs-quickfiles button{min-height:35px!important;white-space:nowrap!important;font-weight:700!important;color:#174957!important;background:#e6f2f4!important;border:1px solid #a9c6cb!important;padding:5px 9px!important;border-radius:6px!important}
+#vs-sec-open{position:static!important;inset:auto!important;z-index:auto!important;display:block!important;flex:1 1 auto!important;width:100%!important;text-align:left!important;min-height:37px!important;max-width:none!important;white-space:normal!important}
+#vs-section-dock{display:block;position:relative;width:100%;min-width:0;flex:none;border:1px solid #bfced2;border-radius:8px;background:#f1f7f8;margin:4px 0 8px;padding:8px;box-sizing:border-box;clear:both}
+#vs-sec-panel{position:static!important;inset:auto!important;top:auto!important;left:auto!important;right:auto!important;bottom:auto!important;transform:none!important;z-index:auto!important;box-shadow:none!important;width:100%!important;max-width:none!important;max-height:none!important;min-width:0!important;overflow:visible!important;padding:9px!important;border-radius:7px!important;margin-top:8px!important;box-sizing:border-box!important}
+#vs-sec-panel label{display:flex!important;flex-wrap:wrap!important;align-items:center!important;gap:5px!important;min-width:0!important}
+#vs-sec-panel input,#vs-sec-panel select,#vs-sec-panel button{min-width:0!important;max-width:100%!important;box-sizing:border-box!important}
+#vs-sec-panel .vs-sec-row{display:flex!important;flex-wrap:wrap!important;gap:8px!important}
+#vs-sec-panel .vs-sec-row>*{min-width:105px!important;flex:1 1 105px!important}
+#vs-sec-panel fieldset{min-width:0!important}
+#R{min-width:0!important;overflow-x:hidden!important;overflow-y:auto!important;overscroll-behavior:contain}
+#R *{overflow-wrap:anywhere}
+@media(max-width:1150px){#T{max-height:28dvh!important;overflow-y:auto!important;overflow-x:hidden!important}#fileMenuControl{position:sticky!important;top:0;z-index:70}#fileMenuPopup{position:fixed!important;left:8px!important;top:56px!important;max-width:calc(100vw - 16px)!important}#vs-quickfiles{position:sticky;top:0;z-index:60}}
+@media(max-width:760px){#vs-section-dock{padding:5px}#R{min-height:0!important;max-height:40dvh!important}#T{max-height:34dvh!important}}
 </style></head><body><section id="vs-welcome" role="dialog" aria-modal="true" aria-labelledby="vsw-title" aria-describedby="vsw-lead"><div class="vsw-card"><aside class="vsw-art"><div class="vsw-overline">Vertascan / Digital Design Systems</div><svg class="vsw-symbol" viewBox="0 0 360 350" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Architectural V monogram with construction geometry"><defs><linearGradient id="vsw-gradient" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#edfefe"/><stop offset="1" stop-color="#74c5c4"/></linearGradient></defs><g fill="none" stroke="#c4e3e4" stroke-opacity=".22" stroke-width="1"><path d="M12 60H348M12 115H348M12 170H348M12 225H348M12 280H348M60 18V330M115 18V330M170 18V330M225 18V330M280 18V330"/><circle cx="180" cy="170" r="124" stroke-dasharray="4 9"/></g><path d="M72 62L173 281L190 281L293 62L244 62L181 208L121 62Z" fill="url(#vsw-gradient)"/><path d="M119 62L181 208L244 62" fill="none" stroke="#0a3036" stroke-width="5" stroke-opacity=".55"/><path d="M72 62H121M244 62H293M173 281H190" stroke="#fff" stroke-opacity=".8" stroke-width="3"/><g stroke="#a8e6e5" stroke-width="2"><path d="M55 62H310" stroke-dasharray="5 8"/><path d="M181 38V300" stroke-dasharray="5 8"/></g><g fill="#c7efed"><circle cx="72" cy="62" r="4"/><circle cx="293" cy="62" r="4"/><circle cx="181" cy="281" r="4"/></g><text x="180" y="334" text-anchor="middle" fill="#c5e5e5" style="font:600 13px 'Segoe UI',sans-serif;letter-spacing:6px">SKETCH BIM</text></svg><div class="vsw-artfoot">Define. Iterate. Produce.<br/>Intelligent Linework</div></aside><div class="vsw-main"><div class="vsw-kicker">Standalone Architectural CAD / BIM</div><h1 id="vsw-title">VERTASCAN<br/><span>SKETCH BIM</span></h1><p class="vsw-lead" id="vsw-lead">Architectural drawing meets intelligent building modeling. Develop schematic enclosures, coordinated assemblies and early technical design information within a focused browser workspace.</p><div class="vsw-rule"></div><div class="vsw-specs"><div class="vsw-spec">Architectural CAD<small>Walls · Rooms · Openings · Roofs</small></div><div class="vsw-spec">Structural Concepts<small>Grid · Columns · Beams</small></div><div class="vsw-spec">Technical Systems<small>MEP · Object Libraries · Layers</small></div><div class="vsw-spec">Presentation<small>3D Views · Camera · Documentation</small></div></div><div id="vsw-description" hidden><strong>About Sketch BIM</strong><div>Sketch BIM is a conceptual architectural CAD/BIM environment with drafting, component tools, quantity-oriented object information and 3D visualization. Its structural, MEP and code-oriented features are preliminary design aids, not independently certified engineering tools.</div></div><div id="vsw-error" role="status" hidden></div><div class="vsw-actions"><button id="vsw-enter" type="button">LAUNCH SKETCH BIM <span aria-hidden="true">↗</span></button><button id="vsw-about" type="button" aria-expanded="false" aria-controls="vsw-description">ABOUT THE APPLICATION</button></div><div class="vsw-notice">Professional evaluation edition · Local browser application · Save projects regularly</div></div></div></section>
 <section id="vsStylesPanel" hidden role="dialog" aria-label="Workspace Visual Styles">
 <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><h2>Workspace Visual Styles</h2><button id="vsStylesClose" aria-label="Close styles">×</button></div>
@@ -3543,7 +3567,7 @@ function systemSources(){return sels().filter(o=>(o.t=='room'||o.t=='slab'||o.t=
 function onBoundary(p,poly,tol=1e-5){return poly.some((a,i)=>seg(p,a,poly[(i+1)%poly.length]).d<tol)}
 function insideRegion(p,poly){return inP(p,poly)||onBoundary(p,poly)}
 function systemMember(t,pts,source,kind,props={}){const o=mk(t,pts,{...props,lv:source.lv});Object.assign(o,props,{lv:source.lv,generated:{source:source.id,kind,sourceStamp:JSON.stringify([source.lv,source.pts,S.lv[source.lv].h])},sourceRoom:source.id});S.o.push(o);return o}
-function sourceGeneration(kind,fn){const sources=systemSources();if(!sources.length)return msg('Select rooms, slabs or closed line boundaries first');const settings=S.systemTools,disc=kind=='frame'?['S']:[...(settings.mechanical?['M']:[]),...(settings.electrical?['E']:[]),...(settings.fire?['F']:[]),...(settings.plumbing?['P']:[])];if(!disc.length)return msg('Enable at least one service discipline');if(disc.some(ly=>S.locked[ly]))return msg('Unlock the enabled disciplines before generation');if(sources.some(objectLocked))return msg('Unlock the source boundaries before generation');let result;transaction(()=>{const ids=new Set(sources.map(o=>o.id)),removed=S.o.filter(o=>ids.has(o.generated?.source)&&o.generated.kind==kind);if(removed.some(objectLocked))throw Error('A previous generated component is locked');const gone=new Set(removed.map(o=>o.id));S.o=S.o.filter(o=>!gone.has(o.id));S.dm=S.dm.filter(d=>!gone.has(d.a.ref?.[0])&&!gone.has(d.b.ref?.[0]));S.tx=S.tx.filter(t=>!gone.has(t.ref));const existing=new Set(S.o.map(o=>o.id)),report=[];for(const src of sources){if(area(src.pts)<.25)throw Error(src.id+': enclosure is too small');fn(src,report);if(S.o.length-existing.size>4000)throw Error('Generation exceeds 4,000 components; increase spacing or select fewer rooms')}const created=S.o.filter(o=>!existing.has(o.id));/* Generated framing/MEP components are not auto-dimensioned. Use the annotation engine after modeling. */ S.autoTags=false;sel=sources.map(o=>o.id);S.systemGenerationReport={kind,count:created.length,rooms:sources.length,notes:report};result=created});if(result)msg('Generated '+result.length+' components for '+sources.length+' enclosure(s). Review Systems schedule and Analyze.');return result}
+function sourceGeneration(kind,fn){const sources=systemSources();if(!sources.length)return msg('Select rooms, slabs or closed line boundaries first');const settings=S.systemTools,disc=kind=='frame'?['S']:[...(settings.mechanical?['M']:[]),...(settings.electrical?['E']:[]),...(settings.fire?['F']:[]),...(settings.plumbing?['P']:[])];if(!disc.length)return msg('Enable at least one service discipline');if(disc.some(ly=>S.locked[ly]))return msg('Unlock the enabled disciplines before generation');if(sources.some(objectLocked))return msg('Unlock the source boundaries before generation');let result;transaction(()=>{const ids=new Set(sources.map(o=>o.id)),removed=S.o.filter(o=>ids.has(o.generated?.source)&&o.generated.kind==kind);if(removed.some(objectLocked))throw Error('A previous generated component is locked');const gone=new Set(removed.map(o=>o.id));S.o=S.o.filter(o=>!gone.has(o.id));S.dm=S.dm.filter(d=>!gone.has(d.a.ref?.[0])&&!gone.has(d.b.ref?.[0]));S.tx=S.tx.filter(t=>!gone.has(t.ref));const existing=new Set(S.o.map(o=>o.id)),report=[];for(const src of sources){if(area(src.pts)<.25)throw Error(src.id+': enclosure is too small');fn(src,report);if(S.o.length-existing.size>4000)throw Error('Generation exceeds 4,000 components; increase spacing or select fewer rooms')}const created=S.o.filter(o=>!existing.has(o.id));S.autoTags=true;for(const o of created.filter(o=>['beam','wall'].includes(o.t)))S.dm.push({a:{x:o.pts[0][0],y:o.pts[0][1],ref:[o.id,0]},b:{x:o.pts[1][0],y:o.pts[1][1],ref:[o.id,1]},o:.45,lv:o.lv,ly:o.ly,auto:true});sel=sources.map(o=>o.id);S.systemGenerationReport={kind,count:created.length,rooms:sources.length,notes:report};result=created});if(result)msg('Generated '+result.length+' components for '+sources.length+' enclosure(s). Review Systems schedule and Analyze.');return result}
 function bayStations(min,max,step){const n=Math.max(1,Math.ceil((max-min)/step));if(n>60)throw Error('Too many structural bays; increase spacing');return Array.from({length:n+1},(_,i)=>min+(max-min)*i/n)}
 function clippedRun(a,b,poly){const out=clipPolygonSegment(a,b,poly);if(!out.length&&insideRegion(a,poly)&&insideRegion(b,poly)&&insideRegion([(a[0]+b[0])/2,(a[1]+b[1])/2],poly))out.push([a,b]);return out.filter(p=>dist(...p)>.05)}
 function generateFramework(){return sourceGeneration('frame',(src,report)=>{const f=S.systemTools,b=bnds([{p:src.pts}]),xs=bayStations(b[0],b[2],f.bayX),ys=bayStations(b[1],b[3],f.bayY),height=S.lv[src.lv].h;if(f.beamDepth>=height)throw Error('Beam depth must be below the level height');const spans=[];for(const x of xs)for(let j=1;j<ys.length;j++)spans.push(...clippedRun([x,ys[j-1]],[x,ys[j]],src.pts));for(const y of ys)for(let i=1;i<xs.length;i++)spans.push(...clippedRun([xs[i-1],y],[xs[i],y],src.pts));const key=p=>p.map(x=>x.toFixed(4)).join(','),columns=new Map(S.o.filter(o=>o.t=='col'&&o.lv==src.lv).map(o=>[key(o.pts[0]),o])),beams=new Set(S.o.filter(o=>o.t=='beam'&&o.lv==src.lv).map(o=>o.pts.map(key).sort().join('|')));for(const pair of spans){for(const p of pair)if(!columns.has(key(p))){const o=systemMember('col',[p],src,'frame',{ly:'S',th:f.colSize,w:f.colSize,h:height,mat:f.material,name:'Frame column',section:f.colSize+' × '+f.colSize});columns.set(key(p),o)}const k=pair.map(key).sort().join('|');if(!beams.has(k)){systemMember('beam',pair,src,'frame',{ly:'S',th:f.beamWidth,w:f.beamWidth,h:f.beamDepth,mat:f.material,name:'Frame beam',section:f.beamWidth+' × '+f.beamDepth});beams.add(k)}}if(!S.axes.enabled){S.axes.enabled=true;S.axes.mode='auto'}report.push(src.id+': '+(xs.length-1)+' × '+(ys.length-1)+' bays; members clipped to the enclosure. Member sizes are user inputs, not capacity calculations.');})}
@@ -4584,8 +4608,8 @@ window.SketchBIMImportFormats={mesh:['OBJ','STL'],underlay:['PNG','JPG','JPEG','
 const $id=id=>document.getElementById(id);
 const safe=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const PREF='vs.sketchbim.annotations.v2';
-const state={tag:false,notes:false,dim:true,mode:'overall',types:'wall,room,slab',offset:.65};
-try{const stored=JSON.parse(localStorage.getItem(PREF)||'{}');if(stored&&typeof stored==='object'){state.tag=stored.tag===true&&stored.mode!=='overall';state.notes=stored.notes===true;state.dim=stored.dim!==false;state.mode=['overall','selected','off'].includes(stored.mode)?stored.mode:'overall';state.offset=Number.isFinite(+stored.offset)?Math.max(.2,Math.min(2,+stored.offset)):.65}}catch(e){}
+const state={tag:true,notes:true,dim:true,types:'wall,beam,col,slab,roof,door,win,stair,room,block,route',offset:.55};
+try{Object.assign(state,JSON.parse(localStorage.getItem(PREF)||'{}'))}catch(e){}
 function save(){try{localStorage.setItem(PREF,JSON.stringify(state))}catch(e){}}
 function ready(){return typeof S!=='undefined'&&Array.isArray(S.o)&&Array.isArray(S.dm)}
 function objects(){return ready()?S.o.filter(o=>o&&o.id&&o.t!=='line'):[]}
@@ -4605,48 +4629,22 @@ function dims(o){
 }
 function generate(){
  if(!ready())return;
- // Only generated annotations are replaced. Preserve manually placed dimensions and notes.
- const old=S.dm.length;
- S.dm=S.dm.filter(d=>!d.smartGenerated&&!d.auto&&!d.vsAuto);
- let count=0;
- const levels=Array.from(new Set(objects().map(o=>o.lv).filter(Number.isInteger)));
- for(const level of levels){
-  if(!state.dim||state.mode==='off')break;
-  if(state.mode==='selected'){
-   const ids=new Set(typeof sel!=='undefined'&&Array.isArray(sel)?sel:[]);
-   for(const o of objects().filter(o=>o.lv===level&&ids.has(o.id)&&['wall','beam','slab','room'].includes(o.t))){
-    const ij=dims(o);if(!ij)continue;
-    const a=o.pts[ij[0]],b=o.pts[ij[1]];
-    if(![...a,...b].every(Number.isFinite))continue;
-    const span=Math.hypot(b[0]-a[0],b[1]-a[1]);if(span<.05||span>200)continue;
-    if(S.dm.some(d=>d.a?.ref?.[0]===o.id&&d.b?.ref?.[0]===o.id))continue;
-    S.dm.push({a:{x:a[0],y:a[1],ref:[o.id,ij[0]]},b:{x:b[0],y:b[1],ref:[o.id,ij[1]]},o:state.offset,lv:level,ly:o.ly||'A',smartGenerated:true,vsAuto:true});count++;
-   }
-   continue;
+ S.dm=S.dm.filter(d=>!d.smartGenerated&&!d.auto);
+ if(state.dim){
+  for(const o of objects().filter(typeAllowed)){
+   const ij=dims(o);if(!ij||!o.pts[ij[0]]||!o.pts[ij[1]])continue;
+   const a=o.pts[ij[0]],b=o.pts[ij[1]];
+   if(![a[0],a[1],b[0],b[1]].every(Number.isFinite))continue;
+   const span=Math.hypot(b[0]-a[0],b[1]-a[1]);
+   if(span<.04||span>10000)continue;
+   if(S.dm.some(d=>d.a?.ref?.[0]===o.id&&d.b?.ref?.[0]===o.id))continue;
+   S.dm.push({a:{x:a[0],y:a[1],ref:[o.id,ij[0]]},b:{x:b[0],y:b[1],ref:[o.id,ij[1]]},
+    o:Math.max(.1,Math.min(2,Number(state.offset)||.55)),lv:o.lv||0,ly:o.ly||'A',smartGenerated:true});
   }
-  // Dimension only the primary architectural footprint. Facade panes, blocks,
-  // MEP routes, beams, columns and attached details must never expand bounds.
-  const shell=objects().filter(o=>o.lv===level&&['wall','slab','room'].includes(o.t)&&Array.isArray(o.pts)&&o.pts.length>=2&&!o.generated&&!o.facadeId);
-  if(!shell.length)continue;
-  const points=shell.flatMap(o=>o.pts).filter(p=>Array.isArray(p)&&p.length>=2&&Number.isFinite(p[0])&&Number.isFinite(p[1])&&Math.abs(p[0])<10000&&Math.abs(p[1])<10000);
-  if(points.length<2)continue;
-  // Trim outlying coordinates from isolated displaced geometry only when enough
-  // points are available; otherwise preserve exact project bounds.
-  const xs=points.map(p=>p[0]).sort((x,y)=>x-y),ys=points.map(p=>p[1]).sort((x,y)=>x-y);
-  const robust=(arr)=>{const n=arr.length; if(n<24)return[arr[0],arr[n-1]];const lo=arr[Math.floor(n*.02)],hi=arr[Math.ceil(n*.98)-1];return [lo,hi]};
-  const [xmin,xmax]=robust(xs),[ymin,ymax]=robust(ys);
-  if(![xmin,xmax,ymin,ymax].every(Number.isFinite))continue;
-  const width=xmax-xmin,height=ymax-ymin;
-  if(width>.05&&width<2000){S.dm.push({a:{x:xmin,y:ymax},b:{x:xmax,y:ymax},o:state.offset,lv:level,ly:'A',smartGenerated:true,vsAuto:true,vsKind:'overall-x'});count++}
-  if(height>.05&&height<2000){S.dm.push({a:{x:xmin,y:ymin},b:{x:xmin,y:ymax},o:state.offset,lv:level,ly:'A',smartGenerated:true,vsAuto:true,vsKind:'overall-y'});count++}
  }
- // Keep the older automatic object-text layer disabled: dense facade assemblies
- // must not create one label per mesh block.
- S.autoTags=false;
  if(typeof commit==='function')commit();
- else {if(typeof rq==='function')rq();if(typeof pr==='function')pr()}
- notice(`Auto Annotate: ${count} controlled dimension(s); ${old-S.dm.length+count} previous automatic dimension(s) replaced. Manual dimensions preserved.`);
- return count;
+ if(typeof rq==='function')rq();
+ if(typeof pr==='function')pr();
 }
 function center(o){
  const pts=Array.isArray(o.pts)?o.pts:[];
@@ -4673,13 +4671,13 @@ texts=function(l){
  try{S.autoTags=false;values=baseTexts(l)}finally{S.autoTags=oldAuto}
  if(!state.tag)return values;
  const tagged=new Set(), occupied=[];
- const candidates=objects().filter(x=>x.lv===l&&typeAllowed(x)&&!x.generated&&!x.facadeId&&x.t!=='block');
+ const candidates=objects().filter(x=>x.lv===l&&typeAllowed(x));
  // Scaled model-space proximity prevents a stack of labels at shared geometry centers.
  for(const o of candidates){
   const c=center(o);if(!c)continue;
   if(!Number.isFinite(c[0])||!Number.isFinite(c[1]))continue;
-  if(occupied.some(p=>Math.abs(p[0]-c[0])<1.3&&Math.abs(p[1]-c[1])<.8))continue;
-  if(occupied.length>=35)break;
+  if(occupied.some(p=>Math.abs(p[0]-c[0])<.75&&Math.abs(p[1]-c[1])<.38))continue;
+  if(occupied.length>=180)break;
   occupied.push(c);
   const label=o.mark||o.id;
   const suffix=state.notes?notesOf(o):'';
@@ -4726,7 +4724,6 @@ function renderPanel(){
  <label><input id="sb-anno-tag" type="checkbox" ${state.tag?'checked':''}> Live object & assembly tags</label>
  <label><input id="sb-anno-notes" type="checkbox" ${state.notes?'checked':''}> Show specification notes</label>
  <label><input id="sb-anno-dim" type="checkbox" ${state.dim?'checked':''}> Generate linked dimensions</label>
- <label>Dimension scope<select id="sb-anno-mode"><option value="overall" ${state.mode==='overall'?'selected':''}>Overall footprint (recommended)</option><option value="selected" ${state.mode==='selected'?'selected':''}>Selected elements only</option><option value="off" ${state.mode==='off'?'selected':''}>No automatic dimensions</option></select></label>
  <label>Dimension offset (m)<input id="sb-anno-offset" type="number" min=".1" max="2" step=".05" value="${state.offset}"></label>
  <div class="tb"><button id="sb-anno-build" type="button">Generate / refresh</button><button id="sb-anno-clear" type="button">Clear generated dimensions</button></div>
  <div class="tb"><button id="sb-anno-print" type="button">Print object schedule to sheet</button><button id="sb-anno-csv" type="button">Export object CSV</button></div>
@@ -4740,8 +4737,7 @@ const basePlot=plotPanel;
 plotPanel=function(){return renderPanel()+basePlot()};
 document.addEventListener('change',e=>{
  const id=e.target?.id;
- if(id==='sb-anno-mode'){state.mode=e.target.value;state.tag=false;}
- else if(id==='sb-anno-tag')state.tag=e.target.checked;
+ if(id==='sb-anno-tag')state.tag=e.target.checked;
  else if(id==='sb-anno-notes')state.notes=e.target.checked;
  else if(id==='sb-anno-dim')state.dim=e.target.checked;
  else if(id==='sb-anno-offset')state.offset=Math.max(.1,Math.min(2,Number(e.target.value)||.55));
@@ -4750,15 +4746,15 @@ document.addEventListener('change',e=>{
 });
 document.addEventListener('click',e=>{
  const b=e.target.closest?.('button[id^="sb-anno-"]');if(!b)return;
- if(b.id==='sb-anno-build'){generate();notice('Generated controlled dimensions; optional tags are filtered and limited')}
- if(b.id==='sb-anno-clear'){if(ready()){S.dm=S.dm.filter(d=>!d.smartGenerated&&!d.auto&&!d.vsAuto);if(typeof commit==='function')commit();notice('Generated dimensions cleared')}}
+ if(b.id==='sb-anno-build'){generate();notice('Updated '+entries().length+' object tags and associated dimensions')}
+ if(b.id==='sb-anno-clear'){if(ready()){S.dm=S.dm.filter(d=>!d.smartGenerated);if(typeof commit==='function')commit();notice('Generated dimensions cleared')}}
  if(b.id==='sb-anno-print')printRegister();
  if(b.id==='sb-anno-csv')csv();
 });
 window.SketchBIMAnnotations={generate,entries,printRegister,exportCSV:csv};
 // Unify legacy Auto Annotate buttons with the current annotation engine.
 // Previous definitions generated a second dimension layer on top of smart dimensions.
-window.autoAnnotate=function(){try{generate()}catch(e){notice('Annotation error: '+e.message);console.error(e)}};
+window.autoAnnotate=function(){try{S.autoTags=false;generate();notice('Annotations regenerated once; old duplicate auto-dimensions removed.')}catch(e){notice('Annotation error: '+e.message)}};
 })();
 </script>
 
@@ -5030,5 +5026,120 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
  modal.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.stage){choose(b.dataset.stage);return}switch(b.dataset.action){case 'close':modal.hidden=true;break;case 'scan':scan();break;case 'backup':backup();break;case 'goto':goto();break;case 'plotcheck':preflight();break;}});
  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!modal.hidden)modal.hidden=true});
  choose('draft');window.SketchBIMProduction={open:()=>{modal.hidden=false;choose(active)},scan,backup,preflight};
+})();
+</script><button type="button" id="vs-sec-open" title="Draw, coordinate and plot model sections">✂ SECTIONS · DETAILS</button>
+<div id="vs-sec-panel" hidden role="dialog" aria-label="Sections and details"><div style="display:flex;justify-content:space-between;align-items:center"><h2>Sections · Details</h2><button type="button" id="vs-sec-close" aria-label="Close sections panel">✕</button></div>
+<div class="mini">Draw a cut across the plan (two clicks). The arrow points to the left of the draw direction. Saved cuts are project-linked and use actual level elevations.</div>
+<label>Section identifier / label<input id="vs-sec-name" value="A" maxlength="24"></label><div class="vs-sec-row"><div><label>View scale</label><select id="vs-sec-scale"><option value="20">1:20</option><option value="50" selected>1:50</option><option value="100">1:100</option><option value="200">1:200</option></select></div><div><label>Projection depth (m)</label><input id="vs-sec-depth" type="number" min="0.1" max="200" value="12" step="0.5"></div></div>
+<label>Drawing sheet</label><select id="vs-sec-paper"><option value="A3">A3 landscape · 420×297 mm</option><option value="A2">A2 landscape · 594×420 mm</option><option value="A1">A1 landscape · 841×594 mm</option><option value="ARCHD">ARCH D · 914×610 mm</option></select>
+<div class="vs-sec-actions"><button type="button" class="primary" id="vs-sec-draw">Draw Section Line</button><button type="button" id="vs-sec-cancel">Cancel drawing</button></div>
+<label>Existing sections</label><select id="vs-sec-list" size="4" aria-label="Saved section cuts"></select>
+<div class="vs-sec-actions"><button type="button" class="primary" id="vs-sec-generate">Generate Section</button><button type="button" id="vs-sec-rename">Update Properties</button><button type="button" id="vs-sec-delete">Delete Cut</button></div>
+<fieldset style="border:1px solid #b8cbd0;border-radius:8px;margin-top:12px;padding:9px"><legend><strong>Linked detail callouts</strong></legend><div class="mini">Position in section coordinates: station from section start, and elevation in metres. Callouts persist in the saved SketchBIM project.</div><div class="vs-sec-row"><label>Detail identifier<input id="vs-sec-detail-label" value="01" maxlength="16"></label><label>Drawing reference<input id="vs-sec-detail-sheet" value="A-501" maxlength="24"></label></div><div class="vs-sec-row"><label>Station (m)<input id="vs-sec-detail-u" type="number" value="1.8" step="0.1"></label><label>Elevation (m)<input id="vs-sec-detail-z" type="number" value="3.9" step="0.1"></label></div><label>Callout diameter (m)<input id="vs-sec-detail-radius" type="number" value="0.7" min="0.2" max="10" step="0.1"></label><div class="vs-sec-actions"><button id="vs-sec-detail-add" type="button">Add Linked Detail</button><button id="vs-sec-detail-delete" type="button">Remove Selected Detail</button></div><select id="vs-sec-detail-list" size="3" aria-label="Linked detail callouts"></select></fieldset><div id="vs-sec-status" class="vs-sec-msg" role="status">Ready. Switch to Plan and draw a section line.</div></div>
+<div id="vs-sec-view" hidden role="dialog" aria-label="Generated section drawing"><div style="display:flex;justify-content:space-between;gap:12px;align-items:center"><strong id="vs-sec-viewtitle">Generated Building Section</strong><button type="button" id="vs-sec-viewclose">✕ Close</button></div><div class="vs-sec-actions"><button type="button" id="vs-sec-print">Print / Save PDF</button><button type="button" id="vs-sec-export">Export SVG</button><span id="vs-sec-viewnote" style="color:#5a6970;font-size:12px;padding:7px">Concept section · design verification required</span></div><div id="vs-sec-svg"></div></div><script id="vs-section-engine">
+/* Vertascan section views: persistent cut, interactive plan bubbles, projected elevation outlines and scaled sheet SVG */
+(function(){'use strict';
+const by=id=>document.getElementById(id), Q=id=>by('vs-sec-'+id), msg=t=>{Q('status').textContent=t};
+let pending=[],drawing=false,activeSvg='',current=null;
+const safe=fn=>function(...args){try{return fn(...args)}catch(e){console.error('SketchBIM Section Engine:',e);msg('Section error: '+e.message)}};
+function model(){return typeof S!=='undefined'&&S&&Array.isArray(S.o)?S:null}
+function sections(){const s=model();if(!s)throw Error('Model not initialized');if(!Array.isArray(s.vsSections))s.vsSections=[];return s.vsSections}
+const number=(n,fallback=0)=>Number.isFinite(Number(n))?Number(n):fallback;
+const P=p=>Array.isArray(p)&&p.length>1&&Number.isFinite(+p[0])&&Number.isFinite(+p[1]);
+function recalc(){const items=sections();const select=Q('list'),keep=select.value;select.replaceChildren();items.forEach(x=>{const op=document.createElement('option');op.value=x.id;op.textContent=x.label+' · 1:'+x.scale+' · '+(x.depth||12)+'m depth';select.append(op)});if(items.some(x=>x.id===keep))select.value=keep;else if(items.length)select.selectedIndex=items.length-1;drawOverlay()}
+function getSelected(){return sections().find(x=>x.id===Q('list').value)}
+function model2screen(p){return [V.ox+p[0]*V.s,V.oy-p[1]*V.s]}
+function overlay(){const base=by('c2');if(!base||!base.parentElement)return null;let c=by('vs-sec-overlay');if(!c){c=document.createElement('canvas');c.id='vs-sec-overlay';base.parentElement.append(c);if(getComputedStyle(base.parentElement).position==='static')base.parentElement.style.position='relative'}const w=base.clientWidth,h=base.clientHeight;if(c.width!==w||c.height!==h){c.width=w;c.height=h}return c}
+function drawOverlay(){const c=overlay();if(!c)return;const g=c.getContext('2d');g.clearRect(0,0,c.width,c.height);if(typeof V==='undefined'||!Number.isFinite(V.s))return;
+function cut(a,b,label,selected){const [x1,y1]=model2screen(a),[x2,y2]=model2screen(b),dx=x2-x1,dy=y2-y1,l=Math.hypot(dx,dy);if(l<2)return;let nx=dy/l,ny=-dx/l;g.save();g.strokeStyle=selected?'#da6b24':'#00788d';g.fillStyle=g.strokeStyle;g.lineWidth=selected?2.7:2;g.setLineDash([13,5,2,5]);g.beginPath();g.moveTo(x1,y1);g.lineTo(x2,y2);g.stroke();g.setLineDash([]);for(const [x,y] of [[x1,y1],[x2,y2]]){g.beginPath();g.fillStyle='#fff';g.arc(x,y,13,0,Math.PI*2);g.fill();g.stroke();g.fillStyle='#153642';g.font='bold 12px system-ui';g.textAlign='center';g.textBaseline='middle';g.fillText(label,x,y);g.beginPath();g.fillStyle=selected?'#da6b24':'#00788d';g.moveTo(x+nx*24,y+ny*24);g.lineTo(x+nx*7-dx/l*5,y+ny*7-dy/l*5);g.lineTo(x+nx*7+dx/l*5,y+ny*7+dy/l*5);g.closePath();g.fill()}g.restore()}
+try{sections().filter(s=>P(s.a)&&P(s.b)).forEach(s=>cut(s.a,s.b,s.label,s.id===Q('list').value))}catch(e){}if(pending.length){const mouse=typeof cur!=='undefined'&&cur&&Number.isFinite(cur.x)?[cur.x,cur.y]:pending[0];if(P(pending[0])&&P(mouse))cut(pending[0],mouse,'+',true)}}
+function cutFromMouse(event){if(!drawing||event.target!==by('c2'))return;event.preventDefault();event.stopImmediatePropagation();if(typeof view==='undefined'||view!=='plan'){msg('Switch to Plan to draw section lines');return}const box=by('c2').getBoundingClientRect(),x=event.clientX-box.left,y=event.clientY-box.top;const p=[(x-V.ox)/V.s,(V.oy-y)/V.s];if(!P(p))return;pending.push(p);if(pending.length===2){const a=pending[0],b=pending[1];if(Math.hypot(a[0]-b[0],a[1]-b[1])<.1){pending=[a];msg('Cut must span at least 100 mm');return}let label=Q('name').value.trim().replace(/[^a-z0-9_-]/gi,'').slice(0,24)||'A';const v={id:'SEC-'+(Date.now()).toString(36)+'-'+Math.random().toString(36).slice(2,7),label,a,b,depth:Math.max(.1,Math.min(200,number(Q('depth').value,12))),scale:+Q('scale').value||50,paper:Q('paper').value,created:new Date().toISOString()};sections().push(v);drawing=false;pending=[];recalc();Q('list').value=v.id;refreshDetails();msg('Section '+label+' saved to project. Generate Section to view and plot.');try{if(typeof rq==='function')rq()}catch(_){}}else {msg('Click second point along section line');drawOverlay()}}
+function escapeXml(v){return String(v).replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[x]))}
+function allDetails(){const m=model();if(!m)return [];if(!Array.isArray(m.vsDetails))m.vsDetails=[];return m.vsDetails}
+function refreshDetails(){const sel=Q('detail-list'),keep=sel.value;sel.replaceChildren();const sec=getSelected();allDetails().filter(d=>sec&&d.sectionId===sec.id).forEach(d=>{const op=document.createElement('option');op.value=d.id;op.textContent=d.label+' / '+d.sheet+' · '+number(d.u).toFixed(2)+'m';sel.append(op)});if([...sel.options].some(o=>o.value===keep))sel.value=keep}
+/* Signed distance from model point to section plane; positive is the viewing side. */
+function segmentClipToCut(p1,p2,halfWidth,ax,ay,ux,uy,nx,ny,L,depth){
+  const local=p=>{const dx=p[0]-ax,dy=p[1]-ay;return [dx*ux+dy*uy,dx*nx+dy*ny]};
+  const a=local(p1),b=local(p2);const dd=b[1]-a[1];
+  // Finite-width segment strip intersects the section plane if signed distance is within half wall width.
+  let intervals=[];
+  if(Math.abs(dd)<1e-9){if(Math.abs(a[1])<=halfWidth+.0001)intervals=[[0,1]]}
+  else{let t0=(-halfWidth-a[1])/dd,t1=(halfWidth-a[1])/dd;if(t0>t1)[t0,t1]=[t1,t0];t0=Math.max(0,t0);t1=Math.min(1,t1);if(t1>=t0)intervals=[[t0,t1]]}
+  return intervals.map(([t0,t1])=>{let lo=a[0]+(b[0]-a[0])*t0,hi=a[0]+(b[0]-a[0])*t1;if(lo>hi)[lo,hi]=[hi,lo];return {uMin:Math.max(0,lo-halfWidth),uMax:Math.min(L,hi+halfWidth),isCut:true,depth:0}}).filter(r=>r.uMax>r.uMin+1e-5)
+}
+function polygonClipAtPlane(pts,ax,ay,ux,uy,nx,ny,L){
+  let crosses=[];for(let i=0;i<pts.length;i++){const p=pts[i],q=pts[(i+1)%pts.length];const pd=(p[0]-ax)*nx+(p[1]-ay)*ny,qd=(q[0]-ax)*nx+(q[1]-ay)*ny;if(Math.abs(pd)<1e-7)crosses.push((p[0]-ax)*ux+(p[1]-ay)*uy);if((pd<0&&qd>0)||(pd>0&&qd<0)){const t=pd/(pd-qd);crosses.push(((p[0]+t*(q[0]-p[0]))-ax)*ux+((p[1]+t*(q[1]-p[1]))-ay)*uy)}}
+  if(!crosses.length)return null;return {uMin:Math.max(0,Math.min(...crosses)),uMax:Math.min(L,Math.max(...crosses))}
+}
+function svgFor(sec){
+ const s=model();if(!s)throw Error('Project not loaded');const [ax,ay]=sec.a,[bx,by]=sec.b,L=Math.hypot(bx-ax,by-ay);if(L<.1)throw Error('Invalid section line');const ux=(bx-ax)/L,uy=(by-ay)/L,nx=uy,ny=-ux,depth=number(sec.depth,12);
+ const dims={A3:[420,297],A2:[594,420],A1:[841,594],ARCHD:[914,610]},[pw,ph]=dims[sec.paper]||dims.A3,scale=number(sec.scale,50),margin=18,roomW=pw-2*margin,roomH=ph-58;
+ const levels=Array.isArray(s.lv)?s.lv:[],minZ=Math.min(-1,...levels.map(l=>number(l.e,0))),maxZ=Math.max(4,...levels.map(l=>number(l.e,0)+number(l.h,0)));
+ const solids=[],background=[],issues=[];const valid=o=>o&&Array.isArray(o.pts)&&o.pts.some(P);
+ for(const o of s.o){if(!valid(o)||['dim','text','tag','route'].includes(o.t)||o.facadeRole)continue;const layer=levels[o.lv];if(!layer)continue;const pts=o.pts.filter(P);if(!pts.length)continue;
+  const z=number(layer.e,0)+number(o.z,0),ht=number(o.h,layer.h||2.8),th=Math.max(.05,number(o.th,.2)),isFlat=['slab','roof','floor'].includes(o.t),z0=isFlat?z-th:z,z1=isFlat?z:Math.max(z+.05,z+ht),mat=String(o.mat||o.asm||'').toLowerCase();
+  const kind=isFlat?'slab':o.t==='wall'?'wall':o.t==='beam'?'beam':o.t==='col'?'column':'other';
+  let spans=[];
+  if(isFlat && pts.length>=3){const span=polygonClipAtPlane(pts,ax,ay,ux,uy,nx,ny,L);if(span&&span.uMax>span.uMin)spans=[{...span,isCut:true,depth:0}];}
+  else if(pts.length>=2&&['wall','beam'].includes(o.t)){spans=segmentClipToCut(pts[0],pts[1],(kind==='beam'?Math.max(th,number(o.w,.3)):th)/2,ax,ay,ux,uy,nx,ny,L,depth)}
+  else if(pts.length===1&&['column','other'].includes(kind)){const dx=pts[0][0]-ax,dy=pts[0][1]-ay,v=dx*nx+dy*ny,u=dx*ux+dy*uy,w=Math.max(.1,number(o.th,.4));if(Math.abs(v)<=w/2)spans=[{uMin:Math.max(0,u-w/2),uMax:Math.min(L,u+w/2),isCut:true,depth:0}]}
+  // Objects behind the cut plane are projection-only, intentionally not hatched.
+  if(!spans.length&&pts.length>=1){const p=pts[0],dx=p[0]-ax,dy=p[1]-ay,v=dx*nx+dy*ny,u=dx*ux+dy*uy;const v2=pts.map(pt=>(pt[0]-ax)*nx+(pt[1]-ay)*ny);if(Math.max(...v2)>=0&&Math.min(...v2)<=depth&&u>=0&&u<=L){const us=pts.map(pt=>(pt[0]-ax)*ux+(pt[1]-ay)*uy);background.push({uMin:Math.max(0,Math.min(...us)),uMax:Math.min(L,Math.max(...us)),z0,z1,id:o.id,kind})}continue}
+  for(const span of spans){if(span.uMax-span.uMin<.003)continue;solids.push({...span,z0,z1,id:o.id,kind,mat,th})}
+ }
+ const minU=0,maxU=L,worldWidth=L,worldHt=Math.max(1,maxZ-minZ),neededW=worldWidth*1000/scale,neededH=worldHt*1000/scale,factor=Math.min(1,roomW/Math.max(.1,neededW),roomH/Math.max(.1,neededH)),k=1000/scale*factor,ox=margin+(roomW-worldWidth*k)/2,base=ph-41;
+ const X=u=>ox+(u-minU)*k,Y=z=>base-(z-minZ)*k;
+ const hatchId=o=>o.kind==='wall'?(o.mat.includes('brick')?'h-brick':o.mat.includes('concrete')?'h-concrete':o.mat.includes('glass')?'h-glass':'h-wall'):o.kind==='slab'?'h-concrete':o.kind==='column'||o.kind==='beam'?'h-concrete':'h-other';
+ let content=`<defs><pattern id="h-concrete" width="3.5" height="3.5" patternUnits="userSpaceOnUse"><path d="M0 3.5L3.5 0" stroke="#6b7880" stroke-width=".3"/></pattern><pattern id="h-brick" width="8" height="4" patternUnits="userSpaceOnUse"><path d="M0 0H8 M0 4H8 M0 0V2 M4 2V4" stroke="#a36a5d" stroke-width=".32" fill="none"/></pattern><pattern id="h-wall" width="4" height="4" patternUnits="userSpaceOnUse"><path d="M0 4L4 0" stroke="#839097" stroke-width=".3"/></pattern><pattern id="h-glass" width="6" height="6" patternUnits="userSpaceOnUse"><path d="M0 6L6 0" stroke="#80bdc9" stroke-width=".2"/></pattern><pattern id="h-other" width="3" height="3" patternUnits="userSpaceOnUse"><circle cx="1.5" cy="1.5" r=".35" fill="#999"/></pattern></defs>`;
+ for(const lv of levels){const z=number(lv.e,0);content+=`<line x1="${margin}" y1="${Y(z)}" x2="${pw-margin}" y2="${Y(z)}" stroke="#9eb1bb" stroke-width=".24" stroke-dasharray="3 1.6"/><text x="${pw-margin-2}" y="${Y(z)-1.2}" font-size="3.2" fill="#406578" text-anchor="end">${escapeXml(lv.n||'Level')} ${z.toFixed(2)}m</text>`}
+ background.forEach(p=>{const w=Math.max(.25,(p.uMax-p.uMin)*k);content+=`<rect x="${X(p.uMin)}" y="${Y(p.z1)}" width="${w}" height="${Math.max(.3,(p.z1-p.z0)*k)}" fill="#ecf1f3" stroke="#9aa8ae" stroke-width=".18" stroke-dasharray="1.4 1"/>`});
+ solids.forEach(p=>{const w=Math.max(.25,(p.uMax-p.uMin)*k),h=Math.max(.3,(p.z1-p.z0)*k),x=X(p.uMin),y=Y(p.z1);content+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#e8eded" stroke="#1e343b" stroke-width=".58"/><rect x="${x}" y="${y}" width="${w}" height="${h}" fill="url(#${hatchId(p)})" stroke="none"/>`});
+ const linked=allDetails().filter(d=>d.sectionId===sec.id);for(const d of linked){const u=number(d.u),z=number(d.z),rad=Math.max(.2,number(d.radius,.7)),cx=X(u),cy=Y(z),rr=Math.max(3,rad*k/2);if(!Number.isFinite(cx+cy)||u<0||u>L)continue;content+=`<circle cx="${cx}" cy="${cy}" r="${rr}" fill="none" stroke="#006b86" stroke-width=".48" stroke-dasharray="2 1"/><path d="M${cx+rr} ${cy-rr}L${cx+rr+8} ${cy-rr-9}h11" stroke="#006b86" stroke-width=".4" fill="none"/><circle cx="${cx+rr+23}" cy="${cy-rr-9}" r="6.5" fill="#fff" stroke="#006b86" stroke-width=".4"/><text x="${cx+rr+23}" y="${cy-rr-9}" font-size="3.7" text-anchor="middle" dominant-baseline="central" font-weight="bold" fill="#004d63">${escapeXml(d.label)}</text><text x="${cx+rr+23}" y="${cy-rr-1}" font-size="2.8" text-anchor="middle" fill="#004d63">${escapeXml(d.sheet)}</text>`}
+ const dY=base+8;content+=`<path d="M${X(0)} ${dY}V${Y(minZ)-2} M${X(L)} ${dY}V${Y(minZ)-2} M${X(0)} ${dY}H${X(L)}" fill="none" stroke="#1c7186" stroke-width=".28"/><text x="${X(L/2)}" y="${dY-2}" text-anchor="middle" font-size="3.4" fill="#1c7186">${L.toFixed(2)} m section length</text>`;
+ const warn=factor<.999?`Reduced to fit sheet (${(factor*100).toFixed(0)}% of nominal 1:${scale}); DO NOT scale-measure.`:`1:${scale} at 100% print size`;
+ const html=`<svg xmlns="http://www.w3.org/2000/svg" width="${pw}mm" height="${ph}mm" viewBox="0 0 ${pw} ${ph}" aria-label="Section ${escapeXml(sec.label)}"><rect x="0" y="0" width="${pw}" height="${ph}" fill="#fff"/><rect x="7" y="7" width="${pw-14}" height="${ph-14}" fill="none" stroke="#253f4a" stroke-width=".45"/>${content}<line x1="7" y1="${ph-23}" x2="${pw-7}" y2="${ph-23}" stroke="#253f4a" stroke-width=".5"/><text x="12" y="${ph-16}" font-family="Arial,sans-serif" font-size="5" font-weight="bold" fill="#193541">VERTASCAN SKETCHBIM · SECTION ${escapeXml(sec.label)}</text><text x="12" y="${ph-10}" font-family="Arial,sans-serif" font-size="3.3" fill="#405560">${escapeXml(warn)} · ${solids.length} cut profiles / ${background.length} projected · ${linked.length} details</text><text x="${pw-12}" y="${ph-15}" text-anchor="end" font-family="Arial,sans-serif" font-size="4" font-weight="bold" fill="#193541">CONCEPT / VERIFY CUTS</text><text x="${pw-12}" y="${ph-10}" text-anchor="end" font-family="Arial,sans-serif" font-size="3.2" fill="#405560">${escapeXml(sec.paper)} · ${escapeXml(sec.label)}</text></svg>`;
+ return{html,warn,count:solids.length,scaleFit:factor}
+}
+function loadControls(sec){Q('name').value=sec.label;Q('scale').value=sec.scale;Q('depth').value=sec.depth;Q('paper').value=sec.paper}
+Q('open').addEventListener('click',safe(()=>{Q('panel').hidden=!Q('panel').hidden;if(!Q('panel').hidden)recalc()}));Q('close').addEventListener('click',()=>Q('panel').hidden=true);
+Q('draw').addEventListener('click',safe(()=>{if(view!=='plan'&&typeof setView==='function')setView('plan');pending=[];drawing=true;msg('Draw section: click start then end on the 2D plan. Press Esc to cancel.')}));
+Q('cancel').addEventListener('click',()=>{drawing=false;pending=[];drawOverlay();msg('Section drawing cancelled')});
+Q('list').addEventListener('change',safe(()=>{const x=getSelected();if(x)loadControls(x);refreshDetails();drawOverlay()}));
+Q('rename').addEventListener('click',safe(()=>{const x=getSelected();if(!x)throw Error('Select a section');x.label=Q('name').value.trim().slice(0,24)||x.label;x.depth=Math.max(.1,Math.min(200,number(Q('depth').value,12)));x.scale=+Q('scale').value||50;x.paper=Q('paper').value;recalc();Q('list').value=x.id;msg('Section properties saved with the project.')}));
+Q('delete').addEventListener('click',safe(()=>{const x=getSelected();if(!x)return;const a=sections(),i=a.indexOf(x);if(i>=0)a.splice(i,1);const m=model();if(m&&Array.isArray(m.vsDetails))m.vsDetails=m.vsDetails.filter(d=>d.sectionId!==x.id);recalc();refreshDetails();msg('Section removed')}));
+Q('detail-add').addEventListener('click',safe(()=>{const sec=getSelected();if(!sec)throw Error('Select a saved section first');const d={id:'DT-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,6),sectionId:sec.id,label:Q('detail-label').value.trim().slice(0,16)||'01',sheet:Q('detail-sheet').value.trim().slice(0,24)||'A-501',u:Math.max(0,Math.min(Math.hypot(sec.b[0]-sec.a[0],sec.b[1]-sec.a[1]),number(Q('detail-u').value))),z:number(Q('detail-z').value),radius:Math.max(.2,Math.min(10,number(Q('detail-radius').value,.7)))};allDetails().push(d);refreshDetails();Q('detail-list').value=d.id;msg('Linked detail '+d.label+' saved to section '+sec.label+'. Save the project JSON to persist.')}));
+Q('detail-delete').addEventListener('click',safe(()=>{const id=Q('detail-list').value;if(!id)return;const a=allDetails(),i=a.findIndex(d=>d.id===id&&d.sectionId===getSelected()?.id);if(i>=0)a.splice(i,1);refreshDetails();msg('Linked detail removed')}));
+Q('generate').addEventListener('click',safe(()=>{const x=getSelected();if(!x)throw Error('Draw or select a section first');const r=svgFor(x);activeSvg=r.html;current=x;Q('svg').innerHTML=r.html;Q('viewtitle').textContent='Section '+x.label+' · '+r.count+' profiles · 1:'+x.scale;Q('viewnote').textContent=r.warn;Q('view').hidden=false;msg('Section generated. '+r.warn)}));
+Q('viewclose').addEventListener('click',()=>Q('view').hidden=true);
+Q('print').addEventListener('click',safe(()=>{if(!activeSvg)return;window.print()}));
+Q('export').addEventListener('click',safe(()=>{if(!activeSvg)return;const file=new Blob([activeSvg],{type:'image/svg+xml'}),url=URL.createObjectURL(file),a=document.createElement('a');a.href=url;a.download='SketchBIM_Section_'+(current?.label||'A')+'.svg';a.click();setTimeout(()=>URL.revokeObjectURL(url),10000)}));
+const base=by('c2');if(base){base.addEventListener('pointerdown',cutFromMouse,true)}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(drawing){drawing=false;pending=[];drawOverlay();msg('Drawing cancelled')}else if(!Q('view').hidden)Q('view').hidden=true}});
+window.addEventListener('resize',()=>drawOverlay());Q('panel').addEventListener('pointerenter',()=>drawOverlay());let prev='';setInterval(()=>{if(Q('panel').hidden&&!(model()?.vsSections?.length))return;try{const sig=[V.ox,V.oy,V.s,view,model()?.vsSections?.length].join('|');if(sig!==prev){prev=sig;drawOverlay()}}catch(_e){}},350);
+try{recalc();refreshDetails()}catch(e){console.warn('Section panel awaiting model',e)}
+})();
+</script><script id="vs-final-workflow-init">
+/* Persistent visible File/New and inspector-docked Sections; no duplicate command engine. */
+(function(){'use strict';
+const $=id=>document.getElementById(id);
+function attach(){
+ const top=$('T'),right=$('R'),file=$('fileMenuControl'),sect=$('vs-sec-open'),panel=$('vs-sec-panel');
+ if(!top||!right||!file||!sect||!panel)return;
+ // Reparent existing buttons to preserve their attached listeners.
+ const quick=document.createElement('div');quick.id='vs-quickfiles';quick.setAttribute('role','group');quick.setAttribute('aria-label','Project file commands');
+ for(const [name,fn] of [['New',()=>typeof newProjectDialog==='function'?newProjectDialog():null],['Open',()=>typeof openProjectFile==='function'?openProjectFile():null],['Save',()=>typeof saveProjectFile==='function'?saveProjectFile():null]]){
+ const b=document.createElement('button');b.type='button';b.textContent=name;b.title=name+' project';b.addEventListener('click',e=>{e.stopPropagation();try{fn()}catch(err){console.error('File command',err);alert(err.message)}});quick.append(b)}
+ file.after(quick);
+ const dock=document.createElement('section');dock.id='vs-section-dock';dock.setAttribute('aria-label','Section creation and detail controls');
+ dock.append(sect,panel);right.insertBefore(dock,right.firstChild);
+ sect.setAttribute('aria-controls','vs-sec-panel');sect.setAttribute('aria-expanded',String(!panel.hidden));
+ const sync=()=>sect.setAttribute('aria-expanded',String(!panel.hidden));
+ sect.addEventListener('click',()=>{queueMicrotask(()=>{sync();if(!panel.hidden){dock.scrollIntoView({block:'nearest',behavior:'instant'});}})});
+ $('vs-sec-close')?.addEventListener('click',()=>queueMicrotask(sync));
+ // Avoid detached offscreen menu on viewport resizing and expose quick file actions.
+ window.addEventListener('resize',()=>{const menu=$('fileMenuPopup');if(menu&&!menu.hidden)menu.hidden=true},{passive:true});
+ window.SketchBIMLayoutQA=()=>({fileVisible:!!file.getClientRects().length,sectionDocked:sect.parentElement===dock&&panel.parentElement===dock,newAction:!!quick.querySelector('button'),viewportWidth:innerWidth});
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',attach,{once:true});else attach();
 })();
 </script></body></html>

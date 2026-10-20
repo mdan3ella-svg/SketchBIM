@@ -2833,6 +2833,15 @@ function build3(){if(!R)return;while(grp.children.length){const c=grp.children[0
   if(t=='wall'){const Ln=len(o),sh=new THREE.Shape(),WE=wEnds(o);const outline=typeof wallElevationOutline=='function'?wallElevationOutline(o):[[0,0],[Ln,0],[Ln,o.h],[0,o.h]];outline.forEach((p,i)=>i?sh.lineTo(...p):sh.moveTo(...p));S.o.forEach(d=>{if(HOST(d)&&d.host==o.id){const u=Math.min(Ln-d.w/2-.01,Math.max(d.w/2+.01,d.pos*Ln)),v0=d.t=='door'?.002:d.sill,h=new THREE.Path();h.moveTo(u-d.w/2,v0);h.lineTo(u+d.w/2,v0);h.lineTo(u+d.w/2,v0+d.h);h.lineTo(u-d.w/2,v0+d.h);sh.holes.push(h)}});vsWallOpenings(o).forEach(v=>{const h=new THREE.Path();h.moveTo(v.at-v.width/2,v.z);h.lineTo(v.at+v.width/2,v.z);h.lineTo(v.at+v.width/2,v.z+v.height);h.lineTo(v.at-v.width/2,v.z+v.height);h.closePath();sh.holes.push(h)});const wg=ex(sh,o.th).translate(0,0,-o.th/2);shearWall(wg,Ln,WE);put(wg,o,o.pts[0][0],o.pts[0][1],e,ang(o))}
   else if(HOST(o)){const h=hp(o);if(!h)return;const w=find(o.host),Ln=len(w),u=Math.min(Ln-o.w/2-.01,Math.max(o.w/2+.01,o.pos*Ln)),sh=new THREE.Shape();sh.moveTo(0,0);sh.lineTo(o.w,0);sh.lineTo(o.w,o.h);sh.lineTo(0,o.h);put(ex(sh,.05).translate(u-o.w/2,t=='door'?.002:o.sill,-.025),o,w.pts[0][0],w.pts[0][1],e,ang(w))}
   else if(t=='slab')put(flat(o.pts,o.th,o.voids),o,0,0,e-o.th);else if(t=='roof')put(flat(o.pts,o.th,o.voids),o,0,0,e+l.h);else if(t=='room')put(flat(o.pts,.01),o,0,0,e+.002);
+  else if(t=='block'&&Array.isArray(o.vsParts)&&o.vsParts.length){
+    const p=o.pts[0],a=Number(o.rotation)||0,cs=Math.cos(a),sn=Math.sin(a),base=e+(Number(o.z)||0);
+    for(const part of o.vsParts){
+      if(!window.vsComponentPartValid||!window.vsComponentPartValid(part))continue;
+      const cx=p[0]+part.x*cs-part.y*sn,cy=p[1]+part.x*sn+part.y*cs;
+      const geo=flat(rectP(cx,cy,a,part.w,part.d),part.h);
+      put(geo,o,0,0,base+part.z);
+    }
+  }
   else if(t=='block'){
     const p=o.pts[0],a=o.rotation||0,cs=Math.cos(a),sn=Math.sin(a),z=e+(o.z||0),w=Math.max(.05,o.w),d=Math.max(.05,o.depth),h=Math.max(.05,o.h);
     const unit=(ox,oy,bw,bd,bh,bz)=>{const xy=[p[0]+ox*cs-oy*sn,p[1]+ox*sn+oy*cs];put(flat(rectP(xy[0],xy[1],a,Math.max(.02,bw),Math.max(.02,bd)),Math.max(.02,bh)),o,0,0,z+bz)};
@@ -5622,6 +5631,171 @@ function unifyFooter(){
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',unifyFooter,{once:true});else unifyFooter();
 window.addEventListener('resize',()=>{const el=document.getElementById('C');if(el)document.documentElement.style.setProperty('--vs-footer-height',Math.ceil(el.getBoundingClientRect().height+6)+'px')},{passive:true});
+})();
+</script>
+<style>
+/* Plot/export studio: predictable controls in a scrollable inspector. */
+#pp .sb-plot-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:10px 0}
+#pp .sb-plot-actions button{min-width:0;white-space:normal;overflow-wrap:anywhere;line-height:1.25;padding:8px 5px}
+#pp .sb-plot-summary{font-size:11px;line-height:1.5;padding:10px;border:1px solid #c4d3d9;border-radius:5px;background:#f4f8fa;color:#274551;overflow-wrap:anywhere}
+#pp .sheetmini{min-height:100px;max-height:min(48vh,420px);overflow:auto}
+#pp label{min-width:0;max-width:100%}
+#pp select,#pp input{min-width:0;max-width:100%;box-sizing:border-box}
+</style>
+<script>
+/* Plot and export repair | 2026-10. Leaves IFC/GLB and native save logic untouched. */
+(function(){
+const previousPanel=plotPanel;
+const baseDownload=exportBase; // unwrapped original ex; avoids legacy preflight blocking on warnings.
+function plotChecks(){
+ const problems=[],notes=[];
+ try{
+  const views=selectedPlotViews();
+  if(!views.length)problems.push('No plot drawings are selected.');
+  for(const v of views){
+   if(['schedule','coordination'].includes(v.kind))continue;
+   try{const layout=plotLayout(v);
+    if(!layout.sh.length)notes.push(v.code+': no drawable linework');
+    if(!layout.scale)notes.push(v.code+': fit-to-sheet output is NOT TO SCALE');
+   }catch(e){problems.push(v.code+': '+e.message)}
+  }
+  const measurements=analyzeDrawing();
+  const errors=measurements.filter(x=>x.severity==='error');
+  if(errors.length)notes.push(errors.length+' model preflight error(s); review QA before professional issue');
+  const warnings=measurements.filter(x=>x.severity==='warning');
+  if(warnings.length)notes.push(warnings.length+' model warnings; export remains available');
+  return {problems,notes,views:views.length};
+ }catch(e){return {problems:[e.message],notes,views:0}}
+}
+function currentVector(){const v=selectedPlotViews()[0];if(!v||['schedule','coordination'].includes(v.kind))throw Error('Choose a graphical plan/elevation/section drawing for DXF or SVG.');return v}
+function exportVectors(kind){
+ const v=currentVector(),data=projectionData(v),sh=data.sh.filter(s=>!s.noPlot&&plotShapeAllowed(s)),tx=data.tx.filter(plotTextAllowed);
+ const all=sh.flatMap(o=>o.p||[]).filter(p=>Array.isArray(p)&&p.every(Number.isFinite));
+ const xs=all.map(p=>p[0]),ys=all.map(p=>p[1]);const minX=xs.length?Math.min(...xs):0,maxX=xs.length?Math.max(...xs):1,minY=ys.length?Math.min(...ys):0,maxY=ys.length?Math.max(...ys):1;
+ const basename=(String(S.project||'SketchBIM')+'_'+v.code).replace(/[^A-Za-z0-9_-]/g,'_');
+ if(kind==='svg'){
+  const pad=1,ww=Math.max(1,maxX-minX+2*pad),hh=Math.max(1,maxY-minY+2*pad);
+  const strokes=sh.map(o=>{const tag=o.c?'polygon':'polyline',pts=(o.p||[]).map(p=>p[0].toFixed(5)+','+(-p[1]).toFixed(5)).join(' ');const color=S.plot.color?o.color||'#273d46':'#172d36';return '<'+tag+' points="'+pts+'" fill="none" stroke="'+color+'" stroke-width="0.015"/>'}).join('');
+  const labels=tx.filter(t=>Number.isFinite(t.x)&&Number.isFinite(t.y)).map(t=>'<text x="'+t.x+'" y="'+(-t.y)+'" font-size="0.18" font-family="Arial,sans-serif">'+esc(String(t.t||''))+'</text>').join('');
+  return dl(basename+'.svg','<svg xmlns="http://www.w3.org/2000/svg" viewBox="'+(minX-pad)+' '+(-maxY-pad)+' '+ww+' '+hh+'"><g>'+strokes+'</g><g fill="#253c47">'+labels+'</g></svg>');
+ }
+ const N=n=>Number(n).toFixed(6),safe=t=>String(t||'').replace(/[^\x20-\x7e]/g,'?').replace(/[\r\n]/g,' '),layers=[...new Set(sh.map(o=>String(o.ly||'MODEL').replace(/[^A-Za-z0-9_-]/g,'_'))),'ANNOT'];
+ let t='0\nSECTION\n2\nHEADER\n9\n$ACADVER\n1\nAC1009\n9\n$INSUNITS\n70\n6\n0\nENDSEC\n0\nSECTION\n2\nTABLES\n0\nTABLE\n2\nLAYER\n70\n'+layers.length+'\n';
+ layers.forEach((name,i)=>{t+='0\nLAYER\n2\n'+name+'\n70\n0\n62\n'+(i%7+1)+'\n6\nCONTINUOUS\n'});t+='0\nENDTAB\n0\nENDSEC\n0\nSECTION\n2\nENTITIES\n';
+ sh.forEach(o=>{const pts=o.p||[];for(let i=0;i<(o.c?pts.length:pts.length-1);i++){const a=pts[i],b=pts[(i+1)%pts.length];if(!a||!b||!a.every(Number.isFinite)||!b.every(Number.isFinite))continue;t+='0\nLINE\n8\n'+String(o.ly||'MODEL').replace(/[^A-Za-z0-9_-]/g,'_')+'\n10\n'+N(a[0])+'\n20\n'+N(a[1])+'\n30\n0\n11\n'+N(b[0])+'\n21\n'+N(b[1])+'\n31\n0\n'}});
+ tx.forEach(x=>{if(!Number.isFinite(x.x)||!Number.isFinite(x.y))return;t+='0\nTEXT\n8\nANNOT\n10\n'+N(x.x)+'\n20\n'+N(x.y)+'\n30\n0\n40\n0.2\n1\n'+safe(x.t)+'\n'});t+='0\nENDSEC\n0\nEOF\n';return dl(basename+'.dxf',t);
+}
+function plotShapeAllowed(x){return drawingAllowed({ly:String(x.ly||'').split('-')[0]})}
+function plotTextAllowed(x){return drawingAllowed({ly:String(x.ly||'').split('-')[0]})}
+async function safeExport(k){
+ try{
+  if(k==='csv')return dl('SketchBIM-component-schedule.csv',scheduleCSV());
+  if(k==='report')return dl('SketchBIM-preflight.json',JSON.stringify({version:APP_VERSION,date:new Date().toISOString(),project:S.project,findings:analyzeDrawing()},null,2));
+  if(k==='json'||k==='ifc'||k==='glb')return await baseDownload(k);
+  const check=plotChecks();if(check.problems.length)throw Error(check.problems.join(' | '));
+  if(k==='pdf')return await baseDownload('pdf');
+  if(k==='dxf'||k==='svg')return await exportVectors(k);
+  return await baseDownload(k);
+ }catch(e){msg('Export unavailable: '+(e.message||e));return false}
+}
+ex=safeExport;
+plotPanel=function(){
+ const base=previousPanel();const result=plotChecks();const strong=result.problems.length?'Plot errors: '+result.problems.map(esc).join(' · '):result.views+' drawing(s) selected · PDF output preflight completed';
+ const summary='<div class="sb-plot-summary"><b>'+strong+'</b>'+result.notes.slice(0,6).map(n=>'<div>• '+esc(n)+'</div>').join('')+'<div><b>DXF/SVG:</b> exports selected graphical drawing (first view for set scope). <b>PDF:</b> obeys current scope and paper settings.</div></div>';
+ const actions='<div class="sb-plot-actions"><button type="button" onclick="ex(\'pdf\')">Export sheets PDF</button><button type="button" onclick="sketchPrintPDF()">Print PDF</button><button type="button" onclick="ex(\'dxf\')">Export drawing DXF</button><button type="button" onclick="ex(\'svg\')">Export drawing SVG</button><button type="button" onclick="ex(\'json\')">Save project JSON</button><button type="button" onclick="sketchPlotCheck()">Validate plot</button></div>';
+ // Preserve the complete existing settings and preview, remove conflicting legacy export buttons.
+ return base.replace(/<button class=primary onclick="ex\('pdf'\)">[^<]*<\/button>/,'').replace(/<button onclick="ex\('dxf'\)">[^<]*<\/button>/,'').replace(/<button onclick="ex\('svg'\)">[^<]*<\/button>/,'')+summary+actions;
+};
+sheetPanel=plotPanel;
+window.sketchPlotCheck=function(){const r=plotChecks();msg(r.problems.length?'Plot check: '+r.problems.join('; '):'Plot validation complete: '+r.views+' view(s). '+r.notes.length+' advisory note(s).');pr()};
+window.sketchPrintPDF=async function(){try{const r=plotChecks();if(r.problems.length)throw Error(r.problems.join('; '));const contents=pdf();const blob=new Blob([contents],{type:'application/pdf'});const url=URL.createObjectURL(blob);const w=window.open(url,'_blank');if(!w){URL.revokeObjectURL(url);throw Error('Allow a pop-up to open the PDF print preview.')}setTimeout(()=>URL.revokeObjectURL(url),60000);msg('PDF opened: use Print at 100% / Actual size in the PDF viewer.')}catch(e){msg('Print unavailable: '+e.message)}};
+})();
+</script>
+
+<style>
+#vs-component-launch{display:block;box-sizing:border-box;margin:8px 0;padding:9px 12px;width:100%;text-align:left;border:1px solid #9fb8bc;border-radius:7px;background:#eaf3f4;color:#20434c;font:600 12px system-ui;cursor:pointer}
+#vs-component-editor{box-sizing:border-box;max-width:100%;padding:10px;margin:8px 0;border:1px solid #a7bdc2;border-radius:8px;background:var(--panel,#f5fafb);color:var(--fg,#263c46);font:12px system-ui}
+#vs-component-editor[hidden]{display:none!important}
+#vs-component-editor label{display:block;margin:6px 0}
+#vs-component-editor input,#vs-component-editor select,#vs-component-editor textarea{box-sizing:border-box;max-width:100%;width:100%;border:1px solid #a8babe;border-radius:4px;padding:6px;color:#18333d;background:#fff;font:12px system-ui}
+#vs-component-editor textarea{font:11px/1.45 monospace;min-height:115px;resize:vertical}
+#vs-component-editor .vs-comp-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 9px}
+#vs-component-editor .vs-comp-actions{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}
+#vs-component-editor button{padding:7px;border:1px solid #a1b8bd;border-radius:5px;color:#214854;background:#edf5f5;cursor:pointer}
+#vs-component-messages{white-space:pre-wrap;font:11px/1.4 system-ui;max-height:150px;overflow:auto}
+</style>
+<script>
+(function(){'use strict';
+const MAX_PARTS=120, MAX_SPAN=100, LIMIT=500;
+const num=(v)=>Number(v),finite=(v)=>Number.isFinite(v);
+const validPart=p=>p&&['box'].includes(p.shape||'box')&&['x','y','z','w','d','h'].every(k=>finite(p[k]))&&p.w>.005&&p.d>.005&&p.h>.005&&p.w<=MAX_SPAN&&p.d<=MAX_SPAN&&p.h<=MAX_SPAN&&Math.abs(p.x)<=LIMIT&&Math.abs(p.y)<=LIMIT&&p.z>=0&&p.z<=MAX_SPAN;
+window.vsComponentPartValid=validPart;
+function parseParts(text){let parts;try{parts=JSON.parse(text)}catch(e){throw Error('Parts JSON is invalid: '+e.message)}
+ if(!Array.isArray(parts)||!parts.length||parts.length>MAX_PARTS)throw Error('Define 1–'+MAX_PARTS+' component parts.');
+ return parts.map((p,i)=>{const n={shape:'box',name:String(p.name||'Part '+(i+1)).slice(0,64)};for(const k of ['x','y','z','w','d','h'])n[k]=num(p[k]);if(!validPart(n))throw Error('Part '+(i+1)+' has invalid size or coordinates.');return n});}
+function extents(parts){let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity,maxZ=0;
+ for(const p of parts){minX=Math.min(minX,p.x-p.w/2);maxX=Math.max(maxX,p.x+p.w/2);minY=Math.min(minY,p.y-p.d/2);maxY=Math.max(maxY,p.y+p.d/2);maxZ=Math.max(maxZ,p.z+p.h)}
+ return {minX,minY,maxX,maxY,w:maxX-minX,d:maxY-minY,h:maxZ};}
+const box=(name,x,y,z,w,d,h)=>({name,shape:'box',x,y,z,w,d,h});
+function preset(style,w,d,h){const leg=Math.max(.035,Math.min(w,d)*.065),z=Math.max(.1,h*.55),a=[];
+ if(style==='desk'||style==='table'){
+ a.push(box('Top',0,0,h-.07,w,d,.07));for(const x of [-w*.42,w*.42])for(const y of [-d*.4,d*.4])a.push(box('Leg',x,y,0,leg,leg,h-.07));
+ if(style==='desk')a.push(box('Apron',0,-d*.38,h*.58,w*.82,.055,h*.25));
+ }else if(style==='chair'||style==='sofa'){
+ const seat=Math.min(h*.53,.46);a.push(box('Seat',0,0,seat-.12,w,d,.12),box('Back',0,d*.43,seat,w,.12,h-seat));
+ for(const x of [-w*.4,w*.4])for(const y of [-d*.38,d*.38])a.push(box('Support',x,y,0,leg,leg,seat-.12));
+ if(style==='sofa')for(const x of [-w*.46,w*.46])a.push(box('Arm',x,0,seat,w*.08,d*.78,.18));
+ }else if(style==='shelf'){
+ for(const x of [-w*.45,w*.45])a.push(box('Upright',x,0,0,Math.max(.025,w*.07),d,h));
+ for(let i=0;i<4;i++)a.push(box('Shelf',0,0,h*i/3,w,d,.05));
+ }else if(style==='cabinet')a.push(box('Case',0,0,0,w,d,h),box('Door',0,-d/2-.018,.08,w*.92,.035,h*.84));
+ else a.push(box('Body',0,0,0,w,d,h));return a;
+}
+function mount(){if(document.getElementById('vs-component-launch'))return;
+ const dock=document.getElementById('vs-advanced-dock')||document.getElementById('R');if(!dock)return;
+ const launch=document.createElement('button');launch.type='button';launch.id='vs-component-launch';launch.textContent='▦ Custom Furniture / Component Assemblies';
+ const panel=document.createElement('section');panel.id='vs-component-editor';panel.hidden=true;
+ panel.innerHTML=`<strong>Custom 3D Component Assembly</strong><p style="margin:5px 0">Model units: metres. A single selectable object contains its constituent solids.</p>
+ <label>Component name<input id="vs-comp-name" value="Custom furniture" maxlength="80"></label>
+ <label>Template<select id="vs-comp-style"><option value="table">Table</option><option value="desk">Desk</option><option value="chair">Chair</option><option value="sofa">Sofa</option><option value="cabinet">Cabinet</option><option value="shelf">Shelving</option><option value="custom">Custom solid</option></select></label>
+ <div class="vs-comp-grid"><label>Width (m)<input id="vs-comp-w" type="number" min="0.02" max="100" step="0.05" value="1.2"></label><label>Depth (m)<input id="vs-comp-d" type="number" min="0.02" max="100" step="0.05" value="0.65"></label><label>Height (m)<input id="vs-comp-h" type="number" min="0.02" max="100" step="0.05" value="0.75"></label><label>Rotation (degrees)<input id="vs-comp-a" type="number" step="15" value="0"></label><label>Plan X (m)<input id="vs-comp-x" type="number" step="0.1" value="0"></label><label>Plan Y (m)<input id="vs-comp-y" type="number" step="0.1" value="0"></label><label>Base Z (m)<input id="vs-comp-z" type="number" min="0" step="0.05" value="0"></label><label>Level<select id="vs-comp-level"></select></label></div>
+ <div class="vs-comp-actions"><button id="vs-comp-generate">Generate template parts</button><button id="vs-comp-from-selection">Load selected component</button></div>
+ <label>Parts — local coordinate box solids (JSON)<textarea id="vs-comp-parts" spellcheck="false"></textarea></label>
+ <div class="vs-comp-actions"><button id="vs-comp-check">Validate assembly</button><button id="vs-comp-create">Create object</button><button id="vs-comp-update">Update selected</button><button id="vs-comp-place">Place by plan click</button></div>
+ <p id="vs-component-messages" role="status" aria-live="polite"></p>`;
+ dock.append(launch,panel);
+ const el=id=>document.getElementById('vs-comp-'+id),msg=document.getElementById('vs-component-messages');
+ function say(t,bad=false){msg.textContent=t;msg.style.color=bad?'#a63732':'#216b5b'}
+ function levels(){const sel=el('level');sel.replaceChildren();(S.lv||[]).forEach((l,i)=>{const opt=document.createElement('option');opt.value=i;opt.textContent=l.n+'  +'+l.e+'m';sel.append(opt)});sel.value=String(Math.min(S.al,S.lv.length-1))}
+ function fields(){const w=num(el('w').value),d=num(el('d').value),h=num(el('h').value),x=num(el('x').value),y=num(el('y').value),z=num(el('z').value),a=num(el('a').value),lv=num(el('level').value);if(![w,d,h,x,y,z,a,lv].every(finite)||w<=.01||d<=.01||h<=.01||w>MAX_SPAN||d>MAX_SPAN||h>MAX_SPAN||Math.abs(x)>LIMIT||Math.abs(y)>LIMIT||z<0||z>MAX_SPAN||!S.lv[lv])throw Error('Invalid location, level, rotation or dimensions.');return {w,d,h,x,y,z,a,lv}}
+ function generated(){const f=fields(),parts=preset(el('style').value,f.w,f.d,f.h);el('parts').value=JSON.stringify(parts,null,2);say(parts.length+' parts generated. Validate before creating.');return parts}
+ function checked(){const f=fields(),parts=parseParts(el('parts').value),e=extents(parts);if(e.w>MAX_SPAN||e.d>MAX_SPAN||e.h>MAX_SPAN)throw Error('Assembly exceeds maximum span.');
+ const name=el('name').value.trim();if(!name)throw Error('Component name is required.');
+ const warnings=[];if(Math.abs(e.w-f.w)>.02||Math.abs(e.d-f.d)>.02||Math.abs(e.h-f.h)>.02)warnings.push('Envelope updated to match the part geometry.');
+ const centreX=(e.minX+e.maxX)/2,centreY=(e.minY+e.maxY)/2;
+ // Recenter local solids at their combined bounding-box origin; preserve their absolute placement by translating the object origin.
+ const c=Math.cos(f.a*Math.PI/180),sn=Math.sin(f.a*Math.PI/180);
+ const centered=parts.map(p=>({...p,x:p.x-centreX,y:p.y-centreY}));
+ return {f,parts:centered,w:e.w,d:e.d,h:e.h,x:f.x+centreX*c-centreY*sn,y:f.y+centreX*sn+centreY*c,name,warnings};}
+ function current(){if(sel.length!==1)throw Error('Select exactly one furniture/component object first.');const o=S.o.find(o=>o.id===sel[0]);if(!o||o.t!=='block')throw Error('Selection is not a furniture/component object.');return o}
+ function createAt(data,existing){const f=data.f,o=existing||mk('block',[[data.x,data.y]],{});o.pts=[[data.x,data.y]];o.t='block';o.lv=f.lv;o.ly='A';o.w=data.w;o.depth=data.d;o.h=data.h;o.z=f.z;o.rotation=f.a*Math.PI/180;o.symbol='custom';o.name=data.name;o.vsParts=data.parts;o.vsComponentSchema=1;o.vsAssembly=true;
+ if(!existing)S.o.push(o);sel=[o.id];dirty=1;commit();rq();say((existing?'Updated':'Created')+' '+o.id+' — '+data.parts.length+' validated parts. '+data.w.toFixed(2)+' × '+data.d.toFixed(2)+' × '+data.h.toFixed(2)+'m. '+data.warnings.join(' '));}
+ launch.addEventListener('click',()=>{panel.hidden=!panel.hidden;if(!panel.hidden){levels();if(!el('parts').value)try{generated()}catch(e){say(e.message,true)}}});
+ el('generate').addEventListener('click',()=>{try{generated()}catch(e){say(e.message,true)}});
+ el('check').addEventListener('click',()=>{try{const d=checked();say('VALID · '+d.parts.length+' parts · '+d.w.toFixed(3)+' × '+d.d.toFixed(3)+' × '+d.h.toFixed(3)+'m. '+d.warnings.join(' '))}catch(e){say('INVALID · '+e.message,true)}});
+ el('create').addEventListener('click',()=>{try{createAt(checked())}catch(e){say(e.message,true)}});
+ el('update').addEventListener('click',()=>{try{const target=current(),d=checked();createAt(d,target)}catch(e){say(e.message,true)}});
+ el('from-selection').addEventListener('click',()=>{try{const o=current();levels();el('name').value=o.name||o.id;el('w').value=o.w;el('d').value=o.depth;el('h').value=o.h;el('x').value=o.pts[0][0];el('y').value=o.pts[0][1];el('z').value=o.z||0;el('a').value=(o.rotation||0)*180/Math.PI;el('level').value=o.lv;el('style').value='custom';el('parts').value=JSON.stringify(o.vsParts||preset('custom',o.w,o.depth,o.h),null,2);say('Loaded '+o.id+'. Changes apply on Update selected.')}catch(e){say(e.message,true)}});
+ el('place').addEventListener('click',()=>{let d;try{d=checked()}catch(e){say(e.message,true);return}if(view!=='plan'){say('Switch to Plan View to place by click.',true);return}const canvas=document.getElementById('c2');if(!canvas){say('Plan canvas unavailable.',true);return}
+ say('Click a location on the plan. Press Escape to cancel.');let active=true;
+ const stop=()=>{if(!active)return;active=false;canvas.removeEventListener('pointerdown',placed,true);document.removeEventListener('keydown',cancel,true)};
+ const cancel=e=>{if(e.key==='Escape'){stop();say('Placement cancelled.')}};
+ const placed=e=>{if(view!=='plan'){stop();say('Placement cancelled when view changed.',true);return}e.preventDefault();e.stopImmediatePropagation();const r=canvas.getBoundingClientRect(),pt=s2w(e.clientX-r.left,e.clientY-r.top);d.x=pt.x;d.y=pt.y;stop();createAt(d)};
+ canvas.addEventListener('pointerdown',placed,true);document.addEventListener('keydown',cancel,true);
+ });
+ window.vsValidateAssemblies=()=>{const failures=[];let count=0;for(const o of S.o){if(!o.vsAssembly)continue;count++;if(o.t!=='block'||!Array.isArray(o.vsParts)||o.vsParts.length<1||o.vsParts.length>MAX_PARTS||o.vsParts.some(p=>!validPart(p)))failures.push(o.id)}return {checked:count,invalid:failures}};
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount,{once:true});else mount();
 })();
 </script>
 </body></html>

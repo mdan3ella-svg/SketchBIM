@@ -5011,6 +5011,7 @@ if(!body||!top||!bottom||!right||!main)return;
 let raf=0;
 // Responsive mode is based on effective CSS viewport (browser zoom included).
 function updateZoomMode(){
+ if(body.classList.contains('vs-wf-focused'))return;
  const viewport=Math.min(document.documentElement.clientWidth||window.innerWidth,window.innerWidth);
  const compact=viewport<1180;
  body.classList.toggle('vs-zoom-compact',compact);
@@ -5019,9 +5020,9 @@ function updateZoomMode(){
 updateZoomMode();
 const toggle=document.createElement('button');toggle.id='vs-scale-inspector';toggle.type='button';toggle.textContent='☷ Inspector';toggle.title='Show or hide object properties, layers and advanced tools';toggle.setAttribute('aria-controls','R');toggle.setAttribute('aria-expanded','false');
 top.insertBefore(toggle,top.firstChild);
-function inspector(open){updateZoomMode();body.classList.toggle('vs-inspector-open',!!open);toggle.setAttribute('aria-expanded',String(!!open));toggle.textContent=open?'✕ Close Inspector':'☷ Inspector';requestLayout();}
+function inspector(open){if(body.classList.contains('vs-wf-focused'))return;updateZoomMode();body.classList.toggle('vs-inspector-open',!!open);toggle.setAttribute('aria-expanded',String(!!open));toggle.textContent=open?'✕ Close Inspector':'☷ Inspector';requestLayout();}
 toggle.addEventListener('click',()=>inspector(!body.classList.contains('vs-inspector-open')));
-function requestLayout(){if(raf)return;raf=requestAnimationFrame(()=>{raf=0;updateZoomMode();
+function requestLayout(){if(body.classList.contains('vs-wf-focused'))return;if(raf)return;raf=requestAnimationFrame(()=>{raf=0;if(body.classList.contains('vs-wf-focused'))return;updateZoomMode();
  document.documentElement.style.setProperty('--vs-header-height',Math.ceil(top.getBoundingClientRect().height+8)+'px');
  document.documentElement.style.setProperty('--vs-footer-height',Math.ceil(bottom.getBoundingClientRect().height+8)+'px');
  // Canvas drawing code already listens for main-container ResizeObserver changes.
@@ -5491,7 +5492,7 @@ const tray=document.createElement('div');tray.id='vs-wf-menu';tray.hidden=true;t
 const sections={file:document.createElement('div'),view:document.createElement('div'),settings:document.createElement('div')};
 for(const [name,node] of Object.entries(sections)){node.className='vs-wf-group';node.id='vs-wf-'+name;node.hidden=true;tray.appendChild(node)}
 const classify=(el)=>{let id=el.id||'';if(['vb','rmd','sun','tg','sec','vs-refresh-viewport'].includes(id)||el.querySelector?.('#vb,#rmd,#sun,#tg,#sec,#vs-refresh-viewport'))return 'view';if(['ud','rd','sv','ld','op','fi','vs-standalone-tools','vs-quickfiles','fileMenuControl'].includes(id)||el.querySelector?.('#ud,#rd,#sv,#ld,#op,#fi,#vs-standalone-tools,#vs-quickfiles,#fileMenuControl'))return 'file';return 'settings'};
-for(const el of children){if(el===brand)continue;if(el.id==='ws-layout-controls'){el.hidden=true;document.body.appendChild(el);continue;}sections[classify(el)].appendChild(el)}
+for(const el of children){if(el===brand)continue;if(el.id==='ws-layout-controls'){sections.settings.appendChild(el);continue;}sections[classify(el)].appendChild(el)}
 const bar=document.createElement('nav');bar.id='vs-wf-bar';bar.setAttribute('aria-label','SketchBIM production workflows');
 const workflows=[['Draft','draft'],['Modify','modify'],['Model','model'],['Inspect','inspect'],['Annotate','annotate'],['Document','document']];
 for(const [label,key] of workflows){const b=document.createElement('button');b.type='button';b.textContent=label;b.dataset.workflow=key;b.setAttribute('aria-selected',String(key==='draft'));bar.appendChild(b)}
@@ -5501,7 +5502,7 @@ if(brand){t.appendChild(brand)}t.append(bar,actions);document.body.append(tray);
 const head=document.createElement('div');head.id='vs-wf-drawer-head';head.innerHTML='<span>WORKSPACE INSPECTOR</span><button type="button" id="vs-wf-close-inspector" aria-label="Close inspector">✕ Close</button>';r.prepend(head);
 let menu=null;
 function showMenu(key){let will=menu!==key;menu=will?key:null;tray.hidden=!menu;for(const [k,node] of Object.entries(sections))node.hidden=k!==menu;actions.querySelectorAll('[data-action]').forEach(x=>x.setAttribute('aria-expanded',String(x.dataset.action===menu)));}
-const setInspector=(open)=>{body.classList.toggle('vs-wf-inspect',!!open);if(open)showMenu(null);requestAnimationFrame(()=>window.dispatchEvent(new Event('resize')))};
+const setInspector=(open)=>{body.classList.toggle('vs-wf-inspect',!!open);actions.querySelector('[data-action="inspector"]')?.setAttribute('aria-expanded',String(!!open));if(open)showMenu(null);requestAnimationFrame(()=>window.dispatchEvent(new Event('resize')))};
 function selectWorkflow(key){bar.querySelectorAll('button').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.workflow===key)));
 showMenu(null);
 if(key==='draft'||key==='modify'){setInspector(false);body.classList.remove('vs-wf-hide-left')}
@@ -5513,7 +5514,7 @@ requestAnimationFrame(()=>window.dispatchEvent(new Event('resize')));
 bar.addEventListener('click',e=>{const b=e.target.closest('button[data-workflow]');if(b)selectWorkflow(b.dataset.workflow)});
 actions.addEventListener('click',e=>{const b=e.target.closest('button[data-action]');if(!b)return;let key=b.dataset.action;if(key==='tools'){body.classList.toggle('vs-wf-hide-left');return}if(key==='inspector'){setInspector(!body.classList.contains('vs-wf-inspect'));return}showMenu(key)});
 document.getElementById('vs-wf-close-inspector').addEventListener('click',()=>setInspector(false));
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){showMenu(null);setInspector(false)}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!e.defaultPrevented){showMenu(null);setInspector(false)}});
 document.addEventListener('pointerdown',e=>{if(!tray.hidden&&!tray.contains(e.target)&&!actions.contains(e.target))showMenu(null)},{capture:true});
 // Migration from older layout settings; the focused shell always starts clean.
 body.classList.add('vs-wf-focused');body.classList.remove('ws-drawer','ws-drawer-open','ws-floating','ws-right-hidden','ws-left-hidden');
@@ -5524,4 +5525,68 @@ window.SketchBIMWorkflowQA=()=>({active:[...bar.querySelectorAll('button')].find
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initialize,{once:true});else initialize();
 })();
 </script>
+
+<script id="vs-evaluation-stabilizer">
+/* Evaluation build: diagnostic and layout conflict quarantine, preserves native command handlers. */
+(()=>{'use strict';
+ const $=id=>document.getElementById(id),body=document.body;
+ const btn=document.createElement('button');btn.type='button';btn.id='vs-eval-command';btn.textContent='✓ QA';btn.title='Run interface and model checks';
+ const target=$('vs-wf-actions')||$('T');if(target)target.appendChild(btn);
+ const dlg=document.createElement('section');dlg.id='vs-eval-diagnostics';dlg.hidden=true;
+ dlg.setAttribute('role','dialog');dlg.setAttribute('aria-label','SketchBIM evaluation checks');
+ dlg.innerHTML='<header><strong>SKETCHBIM · EVALUATION CHECK</strong><button type="button" data-action="close">Close ✕</button></header><p>Read-only UI and model checks. No geometry or saved project data is changed.</p><div id="vs-eval-status" role="status"></div><div id="vs-eval-results"></div><footer><button type="button" data-action="rerun">Run checks</button><button type="button" data-action="export">Export report JSON</button></footer>';
+ document.body.appendChild(dlg);
+ let last=null,events=[];const esc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+ function logError(e){events.push({at:new Date().toISOString(),error:String(e?.message||e).slice(0,300)});if(events.length>40)events.shift()}
+ window.addEventListener('error',e=>logError(e.error||e.message));window.addEventListener('unhandledrejection',e=>logError(e.reason));
+ function scan(){const results=[],add=(level,code,message)=>results.push({level,code,message}),pass=(code,message)=>add('pass',code,message);
+  const suiteStart=Date.now();
+  pass('QA-ENGINE','Diagnostic engine executed successfully');
+  for(const id of ['T','L','M','R','c2','c3','vs-wf-bar','vs-wf-actions','vs-sec-panel']){if(!$(id))add('error','DOM-'+id,'Required UI element absent: '+id)}
+  pass('DOM-CHECK','Required application DOM element check executed');
+  const menus=['file','view','settings'];for(const name of menus){const group=$('vs-wf-'+name);if(!group)add('error','MENU-'+name,'Workflow menu missing: '+name);else if(!group.querySelector('button,select,input'))add('warning','MENU-'+name,'Menu has no interactive commands: '+name)}
+  pass('MENUS-CHECK','Workflow command menu inspection executed');
+  for(const id of ['vs-refresh-viewport','vs-sec-open','vs-section-dock','vs-quickfiles']){if(!$(id))add('warning','TOOL-'+id,'Optional tool not available: '+id)}
+  pass('OPTIONAL-TOOLS-CHECK','Optional command discovery executed');
+  const shell=$('vs-wf-bar');if(shell&&shell.querySelectorAll('button[data-workflow]').length!==6)add('error','WORKFLOWS','Expected six primary workspaces');
+  const ids=new Map();document.querySelectorAll('[id]').forEach(el=>{if(ids.has(el.id))add('error','DUPLICATE-ID','Duplicate DOM ID '+el.id);else ids.set(el.id,1)});
+  pass('WORKSPACE-CHECK','Workspace navigation and duplicate DOM ID checks executed');
+  let objCount=0;try{if(typeof S==='undefined'||!S||!Array.isArray(S.o)||!Array.isArray(S.lv)){add('error','MODEL','BIM model unavailable');}else{
+   objCount=S.o.length;const keys=new Set(),sourceIds=new Set(S.o.filter(Boolean).map(o=>String(o.id)));
+   for(const [i,o] of S.o.entries()){
+    if(!o||typeof o!=='object'){add('error','OBJECT','Invalid object at '+i);continue}
+    if(o.id==null||keys.has(String(o.id)))add('error','OBJECT-ID','Duplicate/missing ID at object '+i);else keys.add(String(o.id));
+    if(!Number.isInteger(Number(o.lv))||Number(o.lv)<0||Number(o.lv)>=S.lv.length)add('warning','LEVEL','Invalid level on object '+String(o.id));
+    if(Array.isArray(o.pts)&&o.pts.some(p=>!Array.isArray(p)||p.length<2||!Number.isFinite(Number(p[0]))||!Number.isFinite(Number(p[1]))))add('error','COORD','Invalid coordinates on object '+String(o.id));
+    if(['door','window'].includes(o.t)&&o.host!=null&&!sourceIds.has(String(o.host)))add('warning','HOST','Missing opening host on '+String(o.id));
+   }
+   pass('OBJECT-INTEGRITY','Scanned '+objCount+' objects for duplicate IDs, level indexes, and finite point coordinates');
+   pass('HOST-REFERENCES','Scanned door/window host identifiers for missing references');
+  }}catch(e){add('error','MODEL-SCAN',String(e.message||e))}
+  for(const e of events.slice(-8))add('warning','RUNTIME',e.error);
+  if(!events.length)pass('RUNTIME-LOG','No runtime exceptions have been captured by this diagnostic listener');
+  add('not_tested','LIVE-GEOMETRY','Geometric correctness, Boolean subtraction, plotted dimensions and 3D rendering require controlled functional tests');
+  add('not_tested','WORKFLOW-INTERACTION','Tool clicks, undo/redo, save/load roundtrips and long-session performance are not exercised by this scan');
+  const summary={pass:results.filter(x=>x.level==='pass').length,fail:results.filter(x=>x.level==='error').length,warning:results.filter(x=>x.level==='warning').length,notTested:results.filter(x=>x.level==='not_tested').length};
+  const report={version:'SketchBIM Evaluation 2026-10 · QA v2',date:new Date().toISOString(),objectCount:objCount,viewport:{width:innerWidth,height:innerHeight},durationMs:Date.now()-suiteStart,summary,results};last=report;
+  const err=results.filter(x=>x.level==='error').length,warn=results.filter(x=>x.level==='warning').length;
+  $('vs-eval-status').textContent=objCount+' objects · '+summary.pass+' passed · '+err+' errors · '+warn+' warnings · '+summary.notTested+' not tested · '+innerWidth+'×'+innerHeight+' CSS viewport';
+  $('vs-eval-results').innerHTML=results.length?results.slice(0,250).map(x=>'<div class="vs-eval-entry '+x.level+'"><strong>'+esc(x.level.toUpperCase())+'</strong> · '+esc(x.message)+'</div>').join(''):'<p>No issues detected by these checks. Drawing accuracy still requires manual validation.</p>';
+  return report;
+ }
+ btn.addEventListener('click',()=>{dlg.hidden=false;scan()});dlg.addEventListener('click',e=>{const a=e.target.closest('button')?.dataset.action;if(a==='close')dlg.hidden=true;if(a==='rerun')scan();if(a==='export'){const report=scan();const blob=new Blob([JSON.stringify(report,null,2)],{type:'application/json'}),u=URL.createObjectURL(blob),el=document.createElement('a');el.href=u;el.download='SketchBIM_Evaluation_QA.json';el.click();setTimeout(()=>URL.revokeObjectURL(u),10000)}});
+ window.SketchBIMEvaluation={scan,get errors(){return events.slice()},open(){dlg.hidden=false;scan()}};
+})();
+</script>
+<style id="vs-evaluation-style">
+#vs-eval-command{font-weight:700;color:#136272!important;border:1px solid #9bc5c9!important;border-radius:6px;min-width:45px}
+#vs-eval-diagnostics[hidden]{display:none!important}#vs-eval-diagnostics{position:fixed;z-index:2147482000;top:clamp(12px,7vh,65px);right:clamp(12px,3vw,36px);width:min(520px,calc(100vw - 24px));max-height:calc(100dvh - 28px);overflow:auto;box-sizing:border-box;background:#fff;color:#193941;border:1px solid #a4b8bd;box-shadow:0 15px 55px #10323b35;border-radius:12px;padding:16px;font:13px/1.5 system-ui,sans-serif}
+#vs-eval-diagnostics header,#vs-eval-diagnostics footer{display:flex;align-items:center;justify-content:space-between;gap:12px;position:sticky;background:#fff;padding:6px 0}#vs-eval-diagnostics header{top:0;border-bottom:1px solid #d4e1e4}#vs-eval-diagnostics footer{bottom:0;border-top:1px solid #d4e1e4}
+#vs-eval-diagnostics button{font:inherit;cursor:pointer;padding:7px 12px;color:#164554;background:#f4f9fa;border:1px solid #a6c2c7;border-radius:6px}
+#vs-eval-status{font-weight:700;padding:12px 0}.vs-eval-entry{padding:6px 8px;border-bottom:1px solid #e5eeee}.vs-eval-entry.error{color:#a52222}.vs-eval-entry.warning{color:#73551d}
+body.vs-wf-focused #vs-scale-inspector{display:none!important}
+body.vs-wf-focused #vs-wf-settings #ws-layout-controls{display:flex!important;flex-wrap:wrap;gap:5px;width:auto;position:static!important}
+@media(max-width:800px){#vs-eval-diagnostics{left:12px;right:12px;width:auto}}
+#vs-eval-results .vs-eval-entry.pass{border-left:3px solid #2d8a74;padding-left:8px}#vs-eval-results .vs-eval-entry.not_tested{border-left:3px solid #9b8e76;padding-left:8px}
+</style>
 </body></html>

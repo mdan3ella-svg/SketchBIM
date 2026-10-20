@@ -5798,4 +5798,30 @@ function mount(){if(document.getElementById('vs-component-launch'))return;
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount,{once:true});else mount();
 })();
 </script>
+<script>
+/* Vertascan SketchBIM Native File 1.0 — portable JSON-envelope document. */
+(()=>{
+'use strict';
+const FORMAT='VERTASCAN_SKETCHBIM',VERSION=1;
+const $n=id=>document.getElementById(id);
+function checksum(t){let h=2166136261;for(let i=0;i<t.length;i++){h^=t.charCodeAt(i);h=Math.imul(h,16777619)}return ('00000000'+(h>>>0).toString(16)).slice(-8)}
+function niceName(name,ext){let b=String(name||S.project||'SketchBIM-Project').replace(/\.(sketchbim|json)$/i,'').replace(/[<>:"/\\|?*\x00-\x1f]/g,'_').trim();return (b||'SketchBIM-Project')+'.'+ext}
+function nativeEnvelope(){const source=JSON.stringify(S);return {format:FORMAT,formatVersion:VERSION,app:'Vertascan SketchBIM',generator:'SketchBIM Native File 1.0',created:new Date().toISOString(),integrity:{algorithm:'fnv1a32-utf16',value:checksum(source)},summary:{name:String(S.project||'Untitled project'),units:S.u||'m',objects:Array.isArray(S.o)?S.o.length:0,levels:Array.isArray(S.lv)?S.lv.length:0},model:S}}
+function parseInput(text){let value;try{value=JSON.parse(text)}catch(e){throw Error('File is not valid JSON or SketchBIM data')}if(value&&value.format===FORMAT){if(value.formatVersion!==VERSION)throw Error('Unsupported SketchBIM file version '+value.formatVersion);if(!value.model||typeof value.model!=='object')throw Error('Native file is missing its model');const tag=value.integrity;if(!tag||tag.algorithm!=='fnv1a32-utf16'||tag.value!==checksum(JSON.stringify(value.model)))throw Error('Native file integrity check failed; file may be corrupted or modified');validProject(value.model);return {model:value.model,native:true}}if(value&&typeof value==='object'&&value.format&&value.format!==FORMAT&&value.model)throw Error('Unrecognized project container');validProject(value);return {model:value,native:false}}
+function downloadText(content,name,mime){const u=URL.createObjectURL(new Blob([content],{type:mime})),a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),12000)}
+function recovery(){try{const data=JSON.stringify(S);localStorage.setItem('sketchbim_manual',data);localStorage.setItem('sketchbim_auto',data);localStorage.setItem('sketchbim_filename',projectFilename)}catch(e){msg('Project downloaded; browser recovery storage unavailable.')}}
+async function saveNative(asNew=false){try{dismissFileMenu();let name=niceName(projectFilename,'sketchbim');if(asNew){const response=prompt('Native SketchBIM filename (.sketchbim):',name);if(response===null)return false;name=niceName(response,'sketchbim')}validProject(S);downloadText(JSON.stringify(nativeEnvelope(),null,2),name,'application/vnd.vertascan.sketchbim+json');projectFilename=name;savedProjectState=JSON.stringify(S);recovery();projectFileLabel();msg('Native SketchBIM file downloaded: '+name);return true}catch(e){msg('Native Save failed: '+e.message);return false}}
+async function exportJSON(){try{dismissFileMenu();validProject(S);const name=niceName(projectFilename,'json');downloadText(JSON.stringify(S,null,2),name,'application/json');msg('Review / interchange JSON downloaded: '+name);return true}catch(e){msg('JSON export failed: '+e.message);return false}}
+async function importFile(file){if(!file)return;if(!/\.(sketchbim|json)$/i.test(file.name))throw Error('Choose .sketchbim or .json');if(file.size>100*1024*1024)throw Error('Project exceeds 100 MB import limit');const parsed=parseInput(await file.text());if(typeof canReplaceProject==='function'&&!canReplaceProject())return;const prev=S;try{loadProject(JSON.stringify(parsed.model));projectFilename=niceName(file.name,parsed.native?'sketchbim':'json');savedProjectState=JSON.stringify(S);projectFileLabel();msg('Opened '+projectFilename+' · '+(parsed.native?'native project':'JSON interchange'))}catch(e){S=prev;throw e}}
+/* Function replacement preserves existing Save keyboard shortcut and File menu handlers. */
+saveProjectFile=saveNative;
+const fi=$n('fi');if(fi){fi.accept='.sketchbim,.json,application/json';fi.onchange=async e=>{const file=e.target.files?.[0];try{await importFile(file)}catch(err){msg('Project not opened: '+err.message)}finally{e.target.value=''}}}
+const op=$n('op');if(op)op.title='Open native .sketchbim or JSON review project';
+const sv=$n('sv');if(sv){sv.textContent='Save .sketchbim';sv.title='Save versioned native SketchBIM project';sv.onclick=()=>saveNative(false)}
+const menu=$n('fileMenuPopup');if(menu){const buttons=[...menu.querySelectorAll('button')];const saveButton=buttons.find(b=>/^Save project\b/i.test(b.textContent));if(saveButton)saveButton.innerHTML='Save native .sketchbim <small>Ctrl+S</small>';const asButton=buttons.find(b=>/^Save project as/i.test(b.textContent));if(asButton)asButton.innerHTML='Save native as… <small>Ctrl+Shift+S</small>';const exportButton=document.createElement('button');exportButton.type='button';exportButton.textContent='Export review / interchange JSON…';exportButton.onclick=exportJSON;const anchor=buttons.find(b=>/Recover browser/i.test(b.textContent));if(anchor)menu.insertBefore(exportButton,anchor);else menu.append(exportButton);const p=menu.querySelector('p');if(p)p.textContent='Native .sketchbim stores a versioned project envelope with a checksum. JSON is a plain-text interchangeable model for review and compatibility.'}
+const fileControl=$n('fileMenuControl');if(fileControl){const btn=document.createElement('button');btn.id='vs-native-json-export';btn.textContent='JSON review';btn.title='Export editable plain JSON for sharing or interchange';btn.onclick=exportJSON;fileControl.appendChild(btn)}
+const backupInput=$n('vs-backup-file');if(backupInput)backupInput.accept='.sketchbim,.json,.sketchbim.json';
+window.SketchBIMFile={version:VERSION,validateText:parseInput,exportNative:()=>saveNative(false),exportJSON,open:importFile};
+})();
+</script>
 </body></html>

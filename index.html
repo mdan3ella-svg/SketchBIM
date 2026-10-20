@@ -5267,4 +5267,72 @@ function attach(){
  bar.appendChild(button);
 })();
 </script>
+<style id="vs-workspace-v2-css">
+/* Unified responsive workspace controller — last-authoritative rules. */
+:root{--ws-left:124px;--ws-right:300px;--ws-top:55px;--ws-bottom:42px;--ws-font:12px}
+html,body{width:100%!important;height:100%!important;max-width:100%!important;overflow:hidden!important}
+body{display:grid!important;grid-template-areas:"t t t" "l m r" "c c c"!important;grid-template-columns:var(--ws-left) minmax(0,1fr) var(--ws-right)!important;grid-template-rows:minmax(var(--ws-top),auto) minmax(0,1fr) minmax(var(--ws-bottom),auto)!important;min-width:0!important;min-height:0!important}
+#T{grid-area:t!important;display:flex!important;flex-wrap:nowrap!important;align-items:center!important;align-content:center!important;min-width:0!important;min-height:var(--ws-top)!important;max-height:var(--ws-top)!important;overflow-x:auto!important;overflow-y:hidden!important;gap:6px!important;padding:5px 9px!important;scrollbar-width:thin;position:relative!important;white-space:nowrap}
+#T>*{flex-shrink:0}#T button,#T select{min-height:32px;white-space:nowrap}#T .vs-product{flex-shrink:0;max-width:215px}
+#L{grid-area:l!important;position:relative!important;display:flex!important;flex-direction:column!important;box-sizing:border-box!important;width:100%!important;min-width:0!important;max-width:none!important;max-height:none!important;overflow-x:hidden!important;overflow-y:auto!important;padding:7px!important;z-index:5!important}
+#M{grid-area:m!important;position:relative!important;width:100%!important;min-width:0!important;min-height:0!important;overflow:hidden!important}
+#R{grid-area:r!important;position:relative!important;inset:auto!important;display:flex!important;flex-direction:column!important;box-sizing:border-box!important;width:100%!important;min-width:0!important;max-width:none!important;min-height:0!important;max-height:none!important;height:auto!important;overflow-x:hidden!important;overflow-y:auto!important;padding:8px!important;transform:none!important;border-radius:0!important;box-shadow:none!important;z-index:6!important}
+#R *,#L *{min-width:0;box-sizing:border-box}#R button,#L button{max-width:100%;white-space:normal;overflow-wrap:anywhere}#R input,#R select,#R textarea{max-width:100%}
+#C{grid-area:c!important;min-height:0!important;max-height:var(--ws-bottom)!important;overflow:auto!important}
+body.ws-left-hidden{grid-template-columns:0px minmax(0,1fr) var(--ws-right)!important}body.ws-left-hidden #L{display:none!important}
+body.ws-right-hidden{grid-template-columns:var(--ws-left) minmax(0,1fr) 0px!important}body.ws-right-hidden #R{display:none!important}
+body.ws-left-hidden.ws-right-hidden{grid-template-columns:0px minmax(0,1fr) 0px!important}
+body.ws-drawer{grid-template-columns:var(--ws-left) minmax(0,1fr) 0px!important}
+body.ws-drawer #R{display:none!important;position:fixed!important;top:var(--ws-top)!important;bottom:var(--ws-bottom)!important;right:0!important;left:auto!important;width:min(var(--ws-right),calc(100vw - 15px))!important;max-height:calc(100dvh - var(--ws-top) - var(--ws-bottom))!important;background:#fff!important;border-left:1px solid #aebec7!important;box-shadow:-8px 2px 25px #17343f33!important;z-index:2050!important}
+body.ws-drawer.ws-drawer-open #R{display:flex!important}
+body.ws-drawer.ws-left-hidden{grid-template-columns:0px minmax(0,1fr) 0px!important}
+body.ws-floating{grid-template-columns:var(--ws-left) minmax(0,1fr) 0px!important}
+body.ws-floating #R{display:flex!important;position:fixed!important;inset:auto 12px 58px auto!important;top:calc(var(--ws-top) + 10px)!important;width:min(var(--ws-right),calc(100vw - 22px))!important;max-height:calc(100dvh - var(--ws-top) - var(--ws-bottom) - 22px)!important;background:#fff!important;border:1px solid #aebec7!important;border-radius:10px!important;box-shadow:0 14px 40px #17343f44!important;z-index:2050!important}
+body.ws-floating.ws-right-hidden #R{display:none!important}
+body.ws-compact #L button,body.ws-compact #R button{font-size:11px!important;min-height:30px!important;padding:5px!important}
+body.ws-compact #R,body.ws-compact #L{font-size:11px!important}
+#ws-layout-controls{flex:0 0 auto;display:flex;align-items:center;gap:5px;margin-left:5px;border-left:1px solid #c5d6da;padding-left:9px;white-space:nowrap}
+#ws-layout-controls button{background:#e7f0f2!important;border:1px solid #a6c2ca!important;border-radius:6px!important;color:#244956!important;padding:6px 9px!important;min-height:33px!important;font:650 11px system-ui!important}
+#ws-layout-controls button[aria-pressed=true]{background:#b9e1e9!important;color:#084c5e!important}
+#ws-layout-panel{position:fixed;z-index:7000;right:12px;top:calc(var(--ws-top) + 8px);width:min(340px,calc(100vw - 24px));max-height:calc(100dvh - var(--ws-top) - 24px);overflow-y:auto;box-sizing:border-box;border:1px solid #95b6bf;box-shadow:0 17px 42px #142c3f4a;background:#fff;color:#1c3642;border-radius:12px;padding:15px;font:12px system-ui}
+#ws-layout-panel[hidden]{display:none!important}#ws-layout-panel h2{font-size:15px;margin:0 0 9px}#ws-layout-panel label{display:grid;gap:4px;margin:9px 0;font-weight:600}#ws-layout-panel input,#ws-layout-panel select{width:100%;box-sizing:border-box;color:#193744;background:#fff;border:1px solid #9ab4bd;padding:7px;border-radius:5px}#ws-layout-panel button{border:1px solid #9ab4bd;border-radius:6px;padding:8px;background:#eaf3f5;color:#163944;font-weight:650;cursor:pointer}#ws-layout-panel .ws-buttons{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+@media(max-width:960px){body{grid-template-columns:var(--ws-left) minmax(0,1fr) 0px!important}body:not(.ws-floating):not(.ws-right-hidden){grid-template-columns:var(--ws-left) minmax(0,1fr) 0px!important}body:not(.ws-floating):not(.ws-right-hidden) #R{display:none!important}body.ws-drawer.ws-drawer-open #R{display:flex!important}body:not(.ws-floating):not(.ws-right-hidden):not(.ws-drawer) #R{display:none!important}}
+@media(max-width:600px){:root{--ws-top:48px;--ws-bottom:45px}#T{gap:4px!important}#ws-layout-controls button{padding:5px 7px!important}#T .vs-product{max-width:140px}#L{padding:4px!important}}
+</style>
+<script id="vs-workspace-v2-js">
+(()=>{'use strict';
+const body=document.body, top=document.getElementById('T'), right=document.getElementById('R');if(!top||!right)return;
+const KEY='vertascan-sketchbim-workspace-v2';
+const defaults={left:124,right:300,dock:'auto',showLeft:true,showRight:true,compact:false};
+let cfg={...defaults};try{let v=JSON.parse(localStorage.getItem(KEY)||'null');if(v&&typeof v==='object')cfg={...cfg,...v}}catch(_e){}
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,Number(v)||a));
+const bar=document.createElement('div');bar.id='ws-layout-controls';bar.innerHTML='<button id="ws-tools-toggle" type="button" title="Show or hide drawing tools">☷ Tools</button><button id="ws-inspector-toggle" type="button" title="Open or close inspector">▤ Inspector</button><button id="ws-layout-toggle" type="button" title="Customize workspace docks">⚙ Layout</button>';top.appendChild(bar);
+const panel=document.createElement('section');panel.id='ws-layout-panel';panel.hidden=true;panel.setAttribute('aria-label','Customize workspace layout');panel.innerHTML='<h2>Workspace · Layout & Docks</h2><p>Adjust tool density and dock widths independently of browser zoom. Settings remain on this device.</p><label>Inspector placement<select id="ws-dock"><option value="auto">Auto · dock on desktop, drawer when narrow</option><option value="right">Always dock right (wide screens)</option><option value="drawer">Collapsible drawer</option><option value="floating">Floating inspector</option></select></label><label>Left tool width <span id="ws-left-read"></span><input id="ws-left-size" type="range" min="78" max="220" step="2"></label><label>Inspector width <span id="ws-right-read"></span><input id="ws-right-size" type="range" min="240" max="460" step="5"></label><label><span><input type="checkbox" id="ws-compact"> Compact controls</span></label><div class="ws-buttons"><button id="ws-reset" type="button">Reset layout</button><button id="ws-close" type="button">Done</button></div>';
+document.body.appendChild(panel);
+const q=id=>document.getElementById(id);
+function repaint(){try{if(typeof window.resize==='function')window.resize()}catch(_e){};window.dispatchEvent(new Event('resize'));try{window.requestAnimationFrame(()=>{if(typeof window.draw==='function')window.draw()})}catch(_e){}}
+let lastMode='';function apply(emit=true){
+ cfg.left=clamp(cfg.left,78,220);cfg.right=clamp(cfg.right,240,460);
+ document.documentElement.style.setProperty('--ws-left',cfg.left+'px');document.documentElement.style.setProperty('--ws-right',cfg.right+'px');
+ const narrow=window.innerWidth<Math.max(960,cfg.left+cfg.right+460);
+ const mode=cfg.dock==='auto'?(narrow?'drawer':'right'):(cfg.dock==='right'&&narrow?'drawer':cfg.dock);
+ body.classList.toggle('ws-left-hidden',!cfg.showLeft);body.classList.toggle('ws-right-hidden',!cfg.showRight);
+ body.classList.toggle('ws-drawer',mode==='drawer');body.classList.toggle('ws-floating',mode==='floating');body.classList.toggle('ws-compact',!!cfg.compact);
+ if(mode!==lastMode){body.classList.remove('ws-drawer-open');lastMode=mode}
+ q('ws-tools-toggle').setAttribute('aria-pressed',String(cfg.showLeft));q('ws-inspector-toggle').setAttribute('aria-pressed',String(cfg.showRight&&(mode!=='drawer'||body.classList.contains('ws-drawer-open'))));
+ q('ws-left-size').value=cfg.left;q('ws-right-size').value=cfg.right;q('ws-dock').value=cfg.dock;q('ws-compact').checked=!!cfg.compact;
+ q('ws-left-read').textContent=cfg.left+' px';q('ws-right-read').textContent=cfg.right+' px';
+ try{localStorage.setItem(KEY,JSON.stringify(cfg))}catch(_e){}
+ if(emit)repaint();
+}
+q('ws-tools-toggle').addEventListener('click',()=>{cfg.showLeft=!cfg.showLeft;apply()});
+q('ws-inspector-toggle').addEventListener('click',()=>{if(body.classList.contains('ws-drawer')){cfg.showRight=true;body.classList.toggle('ws-drawer-open');apply()}else{cfg.showRight=!cfg.showRight;apply()}});
+q('ws-layout-toggle').addEventListener('click',()=>{panel.hidden=!panel.hidden;if(!panel.hidden)q('ws-dock').focus()});q('ws-close').addEventListener('click',()=>panel.hidden=true);
+q('ws-dock').addEventListener('change',e=>{cfg.dock=e.target.value;apply()});q('ws-left-size').addEventListener('input',e=>{cfg.left=Number(e.target.value);apply()});q('ws-right-size').addEventListener('input',e=>{cfg.right=Number(e.target.value);apply()});q('ws-compact').addEventListener('change',e=>{cfg.compact=e.target.checked;apply()});q('ws-reset').addEventListener('click',()=>{cfg={...defaults};apply()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){panel.hidden=true;if(body.classList.contains('ws-drawer-open')){body.classList.remove('ws-drawer-open');apply()}}});
+// Existing older inspector toggle remains available. Synchronize without replacing its listeners.
+let pending=false;window.addEventListener('resize',()=>{if(pending)return;pending=true;requestAnimationFrame(()=>{pending=false;apply(false)})});
+apply();
+})();
+</script>
 </body></html>

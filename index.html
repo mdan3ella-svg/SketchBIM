@@ -5335,4 +5335,91 @@ let pending=false;window.addEventListener('resize',()=>{if(pending)return;pendin
 apply();
 })();
 </script>
+<style id="vs-workflow-shell-v3">
+/* Last-authoritative layout: normal browser zoom is the supported baseline. */
+:root{--ws-top:48px!important;--ws-bottom:38px!important;--ws-left:100px;--ws-right:300px}
+body{grid-template-rows:48px minmax(0,1fr) 38px!important}
+#T{height:48px!important;min-height:48px!important;max-height:48px!important;overflow:visible!important;padding:5px 10px!important;gap:7px!important;z-index:2300!important;isolation:isolate}
+#T .vs-product{max-width:190px!important;min-width:120px;flex-shrink:1!important}
+#T .vs-product small{display:none!important}
+#T #vs-wf-bar{display:flex!important;align-items:center;gap:3px;flex:1;min-width:0;overflow-x:auto;scrollbar-width:thin;flex-wrap:nowrap;padding:2px}
+#T #vs-wf-bar button{min-width:max-content!important;min-height:31px!important;border:1px solid transparent!important;border-radius:6px!important;background:transparent!important;color:#25404b!important;padding:5px 10px!important;font:600 12px system-ui!important;opacity:1!important;pointer-events:auto!important;visibility:visible!important;white-space:nowrap!important}
+#T #vs-wf-bar button:hover,#T #vs-wf-bar button[aria-selected=true]{background:#dceef1!important;color:#034f60!important;border-color:#a7cdd2!important}
+#vs-wf-actions{flex:0 0 auto;display:flex;gap:5px;align-items:center}
+#vs-wf-actions button{padding:6px 9px!important;min-height:32px!important;color:#123b47!important;background:#e9f3f5!important;border:1px solid #b4cfd5!important;border-radius:6px!important;font-weight:700!important;white-space:nowrap!important}
+#ws-layout-controls{display:none!important}
+#vs-wf-menu{position:fixed!important;z-index:9000!important;top:52px!important;right:10px!important;width:min(435px,calc(100vw - 20px));max-height:min(72dvh,670px);overflow:auto;display:block;box-sizing:border-box;border:1px solid #b4c9ce;background:#fff;color:#183744;box-shadow:0 18px 45px #112d3c38;border-radius:10px;padding:12px}
+#vs-wf-menu[hidden]{display:none!important}
+#vs-wf-menu .vs-wf-group{display:flex;flex-wrap:wrap;align-items:center;gap:7px}
+#vs-wf-menu .vs-wf-group>*{flex-shrink:0;max-width:100%}
+#vs-wf-menu button,#vs-wf-menu select{font-size:12px!important;min-height:32px!important;max-width:100%!important;color:#173947!important;background:#f1f7f8!important;border:1px solid #bad0d5!important;opacity:1!important;visibility:visible!important;pointer-events:auto!important}
+#vs-wf-menu label{display:flex;align-items:center;gap:5px;white-space:normal}
+#vs-wf-menu input[type=range]{width:90px!important}
+#vs-wf-menu #vb{display:flex;flex-wrap:wrap;gap:5px;max-width:100%}
+#vs-wf-menu #vs-standalone-tools{display:flex;flex-wrap:wrap;gap:5px}
+#vs-wf-menu #vs-quickfiles{display:flex;flex-wrap:wrap;gap:5px}
+#vs-wf-menu #fileMenuPopup{position:relative!important;top:auto!important;left:auto!important;right:auto!important;max-width:100%!important}
+#L{font-size:12px!important;min-width:0!important;overflow:auto!important}
+#L button{width:100%!important;min-width:0!important;overflow-wrap:break-word!important;padding:7px 5px!important;min-height:32px!important;line-height:1.25!important}
+#R{overflow-y:auto!important;overflow-x:hidden!important}
+#M{min-width:0!important;isolation:isolate}
+body.vs-wf-focused{grid-template-columns:var(--ws-left) minmax(0,1fr) 0px!important}
+body.vs-wf-focused #R{display:none!important}
+body.vs-wf-focused.vs-wf-inspect #R{display:flex!important;position:fixed!important;right:0!important;left:auto!important;top:48px!important;bottom:38px!important;width:min(375px,calc(100vw - 24px))!important;height:calc(100dvh - 86px)!important;max-height:calc(100dvh - 86px)!important;background:#fff!important;box-shadow:-10px 4px 35px #0c283943!important;z-index:2200!important;overflow:auto!important}
+body.vs-wf-focused.vs-wf-inspect #R *{max-width:100%;box-sizing:border-box}
+body.vs-wf-focused.vs-wf-inspect #R input,body.vs-wf-focused.vs-wf-inspect #R select{max-width:100%}
+body.vs-wf-focused.vs-wf-hide-left{grid-template-columns:0px minmax(0,1fr) 0px!important}
+body.vs-wf-focused.vs-wf-hide-left #L{display:none!important}
+#vs-wf-drawer-head{display:none;position:sticky;top:0;z-index:20;background:#e7f1f4;border-bottom:1px solid #b9ced3;padding:8px;align-items:center;justify-content:space-between;color:#193b48;font-weight:700}
+body.vs-wf-inspect #vs-wf-drawer-head{display:flex!important}
+#vs-wf-drawer-head button{border:1px solid #9cb6bd;padding:5px 9px;border-radius:5px;background:#fff;color:#163946;font-weight:700}
+#vs-wf-shortcuts{font-size:11px;color:#617b84;white-space:nowrap}
+@media(max-width:1100px){#T .vs-product{display:none!important}#vs-wf-bar button{padding:5px 7px!important}#vs-wf-shortcuts{display:none}}
+@media(max-width:700px){:root{--ws-left:78px}#T{padding:4px!important;gap:2px!important}#T #vs-wf-bar button{font-size:11px!important;padding:5px!important}#vs-wf-actions button{font-size:11px!important;padding:5px!important}#L button{font-size:11px!important}#C{font-size:11px!important}}
+</style>
+<script id="vs-workflow-shell-v3-js">
+(function(){'use strict';
+function initialize(){
+const t=document.getElementById('T'), l=document.getElementById('L'),r=document.getElementById('R');if(!t||!l||!r||document.getElementById('vs-wf-bar'))return;
+const body=document.body;
+// Keep existing button DOM nodes, including their listeners. No duplicate command dispatch.
+const children=[...t.children];
+const brand=children.find(x=>x.classList&&x.classList.contains('vs-product'));
+const tray=document.createElement('div');tray.id='vs-wf-menu';tray.hidden=true;tray.setAttribute('role','region');tray.setAttribute('aria-label','Application commands');
+const sections={file:document.createElement('div'),view:document.createElement('div'),settings:document.createElement('div')};
+for(const [name,node] of Object.entries(sections)){node.className='vs-wf-group';node.id='vs-wf-'+name;node.hidden=true;tray.appendChild(node)}
+const classify=(el)=>{let id=el.id||'';if(['vb','rmd','sun','tg','sec','vs-refresh-viewport'].includes(id)||el.querySelector?.('#vb,#rmd,#sun,#tg,#sec,#vs-refresh-viewport'))return 'view';if(['ud','rd','sv','ld','op','fi','vs-standalone-tools','vs-quickfiles','fileMenuControl'].includes(id)||el.querySelector?.('#ud,#rd,#sv,#ld,#op,#fi,#vs-standalone-tools,#vs-quickfiles,#fileMenuControl'))return 'file';return 'settings'};
+for(const el of children){if(el===brand)continue;if(el.id==='ws-layout-controls'){el.remove();continue;}sections[classify(el)].appendChild(el)}
+const bar=document.createElement('nav');bar.id='vs-wf-bar';bar.setAttribute('aria-label','SketchBIM production workflows');
+const workflows=[['Draft','draft'],['Modify','modify'],['Model','model'],['Inspect','inspect'],['Annotate','annotate'],['Document','document']];
+for(const [label,key] of workflows){const b=document.createElement('button');b.type='button';b.textContent=label;b.dataset.workflow=key;b.setAttribute('aria-selected',String(key==='draft'));bar.appendChild(b)}
+const actions=document.createElement('div');actions.id='vs-wf-actions';
+for(const [label,key] of [['File','file'],['Views','view'],['Settings','settings'],['Tools','tools'],['Inspector','inspector']]){const b=document.createElement('button');b.type='button';b.textContent=label;b.dataset.action=key;actions.appendChild(b)}
+if(brand){t.appendChild(brand)}t.append(bar,actions);document.body.append(tray);
+const head=document.createElement('div');head.id='vs-wf-drawer-head';head.innerHTML='<span>WORKSPACE INSPECTOR</span><button type="button" id="vs-wf-close-inspector" aria-label="Close inspector">✕ Close</button>';r.prepend(head);
+let menu=null;
+function showMenu(key){let will=menu!==key;menu=will?key:null;tray.hidden=!menu;for(const [k,node] of Object.entries(sections))node.hidden=k!==menu;actions.querySelectorAll('[data-action]').forEach(x=>x.setAttribute('aria-expanded',String(x.dataset.action===menu)));}
+const setInspector=(open)=>{body.classList.toggle('vs-wf-inspect',!!open);if(open)showMenu(null);requestAnimationFrame(()=>window.dispatchEvent(new Event('resize')))};
+function selectWorkflow(key){bar.querySelectorAll('button').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.workflow===key)));
+showMenu(null);
+if(key==='draft'||key==='modify'){setInspector(false);body.classList.remove('vs-wf-hide-left')}
+else{setInspector(true);if(key==='inspect'||key==='document')body.classList.add('vs-wf-hide-left');else body.classList.remove('vs-wf-hide-left')}
+// Only locate the intended existing tabs; do not synthesize new editor commands.
+const tabs=document.getElementById('tabs');if(tabs){const targets={model:/model|bim|architect/i,inspect:/property|inspect|analy|layer/i,annotate:/annot|dimension|quantit/i,document:/plot|sheet|print|schedule/i};const rx=targets[key];if(rx){let b=[...tabs.querySelectorAll('button')].find(x=>rx.test(x.textContent||x.title||''));if(b)b.click()}}
+requestAnimationFrame(()=>window.dispatchEvent(new Event('resize')));
+}
+bar.addEventListener('click',e=>{const b=e.target.closest('button[data-workflow]');if(b)selectWorkflow(b.dataset.workflow)});
+actions.addEventListener('click',e=>{const b=e.target.closest('button[data-action]');if(!b)return;let key=b.dataset.action;if(key==='tools'){body.classList.toggle('vs-wf-hide-left');return}if(key==='inspector'){setInspector(!body.classList.contains('vs-wf-inspect'));return}showMenu(key)});
+document.getElementById('vs-wf-close-inspector').addEventListener('click',()=>setInspector(false));
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){showMenu(null);setInspector(false)}});
+document.addEventListener('pointerdown',e=>{if(!tray.hidden&&!tray.contains(e.target)&&!actions.contains(e.target))showMenu(null)},{capture:true});
+// Migration from older layout settings; the focused shell always starts clean.
+body.classList.add('vs-wf-focused');body.classList.remove('ws-drawer','ws-drawer-open','ws-floating','ws-right-hidden','ws-left-hidden');
+document.documentElement.style.setProperty('--ws-left','100px');
+// A late status indicator makes missing commands discoverable without a giant toolbar.
+window.SketchBIMWorkflowQA=()=>({active:[...bar.querySelectorAll('button')].find(x=>x.getAttribute('aria-selected')==='true')?.dataset.workflow,menu,inspectorOpen:body.classList.contains('vs-wf-inspect'),fileActions:sections.file.querySelectorAll('button').length,viewActions:sections.view.querySelectorAll('button').length,viewportWidth:document.getElementById('M')?.clientWidth});
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initialize,{once:true});else initialize();
+})();
+</script>
 </body></html>

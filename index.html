@@ -3543,7 +3543,7 @@ function systemSources(){return sels().filter(o=>(o.t=='room'||o.t=='slab'||o.t=
 function onBoundary(p,poly,tol=1e-5){return poly.some((a,i)=>seg(p,a,poly[(i+1)%poly.length]).d<tol)}
 function insideRegion(p,poly){return inP(p,poly)||onBoundary(p,poly)}
 function systemMember(t,pts,source,kind,props={}){const o=mk(t,pts,{...props,lv:source.lv});Object.assign(o,props,{lv:source.lv,generated:{source:source.id,kind,sourceStamp:JSON.stringify([source.lv,source.pts,S.lv[source.lv].h])},sourceRoom:source.id});S.o.push(o);return o}
-function sourceGeneration(kind,fn){const sources=systemSources();if(!sources.length)return msg('Select rooms, slabs or closed line boundaries first');const settings=S.systemTools,disc=kind=='frame'?['S']:[...(settings.mechanical?['M']:[]),...(settings.electrical?['E']:[]),...(settings.fire?['F']:[]),...(settings.plumbing?['P']:[])];if(!disc.length)return msg('Enable at least one service discipline');if(disc.some(ly=>S.locked[ly]))return msg('Unlock the enabled disciplines before generation');if(sources.some(objectLocked))return msg('Unlock the source boundaries before generation');let result;transaction(()=>{const ids=new Set(sources.map(o=>o.id)),removed=S.o.filter(o=>ids.has(o.generated?.source)&&o.generated.kind==kind);if(removed.some(objectLocked))throw Error('A previous generated component is locked');const gone=new Set(removed.map(o=>o.id));S.o=S.o.filter(o=>!gone.has(o.id));S.dm=S.dm.filter(d=>!gone.has(d.a.ref?.[0])&&!gone.has(d.b.ref?.[0]));S.tx=S.tx.filter(t=>!gone.has(t.ref));const existing=new Set(S.o.map(o=>o.id)),report=[];for(const src of sources){if(area(src.pts)<.25)throw Error(src.id+': enclosure is too small');fn(src,report);if(S.o.length-existing.size>4000)throw Error('Generation exceeds 4,000 components; increase spacing or select fewer rooms')}const created=S.o.filter(o=>!existing.has(o.id));S.autoTags=true;for(const o of created.filter(o=>['beam','wall'].includes(o.t)))S.dm.push({a:{x:o.pts[0][0],y:o.pts[0][1],ref:[o.id,0]},b:{x:o.pts[1][0],y:o.pts[1][1],ref:[o.id,1]},o:.45,lv:o.lv,ly:o.ly,auto:true});sel=sources.map(o=>o.id);S.systemGenerationReport={kind,count:created.length,rooms:sources.length,notes:report};result=created});if(result)msg('Generated '+result.length+' components for '+sources.length+' enclosure(s). Review Systems schedule and Analyze.');return result}
+function sourceGeneration(kind,fn){const sources=systemSources();if(!sources.length)return msg('Select rooms, slabs or closed line boundaries first');const settings=S.systemTools,disc=kind=='frame'?['S']:[...(settings.mechanical?['M']:[]),...(settings.electrical?['E']:[]),...(settings.fire?['F']:[]),...(settings.plumbing?['P']:[])];if(!disc.length)return msg('Enable at least one service discipline');if(disc.some(ly=>S.locked[ly]))return msg('Unlock the enabled disciplines before generation');if(sources.some(objectLocked))return msg('Unlock the source boundaries before generation');let result;transaction(()=>{const ids=new Set(sources.map(o=>o.id)),removed=S.o.filter(o=>ids.has(o.generated?.source)&&o.generated.kind==kind);if(removed.some(objectLocked))throw Error('A previous generated component is locked');const gone=new Set(removed.map(o=>o.id));S.o=S.o.filter(o=>!gone.has(o.id));S.dm=S.dm.filter(d=>!gone.has(d.a.ref?.[0])&&!gone.has(d.b.ref?.[0]));S.tx=S.tx.filter(t=>!gone.has(t.ref));const existing=new Set(S.o.map(o=>o.id)),report=[];for(const src of sources){if(area(src.pts)<.25)throw Error(src.id+': enclosure is too small');fn(src,report);if(S.o.length-existing.size>4000)throw Error('Generation exceeds 4,000 components; increase spacing or select fewer rooms')}const created=S.o.filter(o=>!existing.has(o.id));/* Generated framing/MEP components are not auto-dimensioned. Use the annotation engine after modeling. */ S.autoTags=false;sel=sources.map(o=>o.id);S.systemGenerationReport={kind,count:created.length,rooms:sources.length,notes:report};result=created});if(result)msg('Generated '+result.length+' components for '+sources.length+' enclosure(s). Review Systems schedule and Analyze.');return result}
 function bayStations(min,max,step){const n=Math.max(1,Math.ceil((max-min)/step));if(n>60)throw Error('Too many structural bays; increase spacing');return Array.from({length:n+1},(_,i)=>min+(max-min)*i/n)}
 function clippedRun(a,b,poly){const out=clipPolygonSegment(a,b,poly);if(!out.length&&insideRegion(a,poly)&&insideRegion(b,poly)&&insideRegion([(a[0]+b[0])/2,(a[1]+b[1])/2],poly))out.push([a,b]);return out.filter(p=>dist(...p)>.05)}
 function generateFramework(){return sourceGeneration('frame',(src,report)=>{const f=S.systemTools,b=bnds([{p:src.pts}]),xs=bayStations(b[0],b[2],f.bayX),ys=bayStations(b[1],b[3],f.bayY),height=S.lv[src.lv].h;if(f.beamDepth>=height)throw Error('Beam depth must be below the level height');const spans=[];for(const x of xs)for(let j=1;j<ys.length;j++)spans.push(...clippedRun([x,ys[j-1]],[x,ys[j]],src.pts));for(const y of ys)for(let i=1;i<xs.length;i++)spans.push(...clippedRun([xs[i-1],y],[xs[i],y],src.pts));const key=p=>p.map(x=>x.toFixed(4)).join(','),columns=new Map(S.o.filter(o=>o.t=='col'&&o.lv==src.lv).map(o=>[key(o.pts[0]),o])),beams=new Set(S.o.filter(o=>o.t=='beam'&&o.lv==src.lv).map(o=>o.pts.map(key).sort().join('|')));for(const pair of spans){for(const p of pair)if(!columns.has(key(p))){const o=systemMember('col',[p],src,'frame',{ly:'S',th:f.colSize,w:f.colSize,h:height,mat:f.material,name:'Frame column',section:f.colSize+' × '+f.colSize});columns.set(key(p),o)}const k=pair.map(key).sort().join('|');if(!beams.has(k)){systemMember('beam',pair,src,'frame',{ly:'S',th:f.beamWidth,w:f.beamWidth,h:f.beamDepth,mat:f.material,name:'Frame beam',section:f.beamWidth+' × '+f.beamDepth});beams.add(k)}}if(!S.axes.enabled){S.axes.enabled=true;S.axes.mode='auto'}report.push(src.id+': '+(xs.length-1)+' × '+(ys.length-1)+' bays; members clipped to the enclosure. Member sizes are user inputs, not capacity calculations.');})}
@@ -4584,8 +4584,8 @@ window.SketchBIMImportFormats={mesh:['OBJ','STL'],underlay:['PNG','JPG','JPEG','
 const $id=id=>document.getElementById(id);
 const safe=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const PREF='vs.sketchbim.annotations.v2';
-const state={tag:true,notes:true,dim:true,types:'wall,beam,col,slab,roof,door,win,stair,room,block,route',offset:.55};
-try{Object.assign(state,JSON.parse(localStorage.getItem(PREF)||'{}'))}catch(e){}
+const state={tag:false,notes:false,dim:true,mode:'overall',types:'wall,room,slab',offset:.65};
+try{const stored=JSON.parse(localStorage.getItem(PREF)||'{}');if(stored&&typeof stored==='object'){state.tag=stored.tag===true&&stored.mode!=='overall';state.notes=stored.notes===true;state.dim=stored.dim!==false;state.mode=['overall','selected','off'].includes(stored.mode)?stored.mode:'overall';state.offset=Number.isFinite(+stored.offset)?Math.max(.2,Math.min(2,+stored.offset)):.65}}catch(e){}
 function save(){try{localStorage.setItem(PREF,JSON.stringify(state))}catch(e){}}
 function ready(){return typeof S!=='undefined'&&Array.isArray(S.o)&&Array.isArray(S.dm)}
 function objects(){return ready()?S.o.filter(o=>o&&o.id&&o.t!=='line'):[]}
@@ -4605,22 +4605,48 @@ function dims(o){
 }
 function generate(){
  if(!ready())return;
- S.dm=S.dm.filter(d=>!d.smartGenerated&&!d.auto);
- if(state.dim){
-  for(const o of objects().filter(typeAllowed)){
-   const ij=dims(o);if(!ij||!o.pts[ij[0]]||!o.pts[ij[1]])continue;
-   const a=o.pts[ij[0]],b=o.pts[ij[1]];
-   if(![a[0],a[1],b[0],b[1]].every(Number.isFinite))continue;
-   const span=Math.hypot(b[0]-a[0],b[1]-a[1]);
-   if(span<.04||span>10000)continue;
-   if(S.dm.some(d=>d.a?.ref?.[0]===o.id&&d.b?.ref?.[0]===o.id))continue;
-   S.dm.push({a:{x:a[0],y:a[1],ref:[o.id,ij[0]]},b:{x:b[0],y:b[1],ref:[o.id,ij[1]]},
-    o:Math.max(.1,Math.min(2,Number(state.offset)||.55)),lv:o.lv||0,ly:o.ly||'A',smartGenerated:true});
+ // Only generated annotations are replaced. Preserve manually placed dimensions and notes.
+ const old=S.dm.length;
+ S.dm=S.dm.filter(d=>!d.smartGenerated&&!d.auto&&!d.vsAuto);
+ let count=0;
+ const levels=Array.from(new Set(objects().map(o=>o.lv).filter(Number.isInteger)));
+ for(const level of levels){
+  if(!state.dim||state.mode==='off')break;
+  if(state.mode==='selected'){
+   const ids=new Set(typeof sel!=='undefined'&&Array.isArray(sel)?sel:[]);
+   for(const o of objects().filter(o=>o.lv===level&&ids.has(o.id)&&['wall','beam','slab','room'].includes(o.t))){
+    const ij=dims(o);if(!ij)continue;
+    const a=o.pts[ij[0]],b=o.pts[ij[1]];
+    if(![...a,...b].every(Number.isFinite))continue;
+    const span=Math.hypot(b[0]-a[0],b[1]-a[1]);if(span<.05||span>200)continue;
+    if(S.dm.some(d=>d.a?.ref?.[0]===o.id&&d.b?.ref?.[0]===o.id))continue;
+    S.dm.push({a:{x:a[0],y:a[1],ref:[o.id,ij[0]]},b:{x:b[0],y:b[1],ref:[o.id,ij[1]]},o:state.offset,lv:level,ly:o.ly||'A',smartGenerated:true,vsAuto:true});count++;
+   }
+   continue;
   }
+  // Dimension only the primary architectural footprint. Facade panes, blocks,
+  // MEP routes, beams, columns and attached details must never expand bounds.
+  const shell=objects().filter(o=>o.lv===level&&['wall','slab','room'].includes(o.t)&&Array.isArray(o.pts)&&o.pts.length>=2&&!o.generated&&!o.facadeId);
+  if(!shell.length)continue;
+  const points=shell.flatMap(o=>o.pts).filter(p=>Array.isArray(p)&&p.length>=2&&Number.isFinite(p[0])&&Number.isFinite(p[1])&&Math.abs(p[0])<10000&&Math.abs(p[1])<10000);
+  if(points.length<2)continue;
+  // Trim outlying coordinates from isolated displaced geometry only when enough
+  // points are available; otherwise preserve exact project bounds.
+  const xs=points.map(p=>p[0]).sort((x,y)=>x-y),ys=points.map(p=>p[1]).sort((x,y)=>x-y);
+  const robust=(arr)=>{const n=arr.length; if(n<24)return[arr[0],arr[n-1]];const lo=arr[Math.floor(n*.02)],hi=arr[Math.ceil(n*.98)-1];return [lo,hi]};
+  const [xmin,xmax]=robust(xs),[ymin,ymax]=robust(ys);
+  if(![xmin,xmax,ymin,ymax].every(Number.isFinite))continue;
+  const width=xmax-xmin,height=ymax-ymin;
+  if(width>.05&&width<2000){S.dm.push({a:{x:xmin,y:ymax},b:{x:xmax,y:ymax},o:state.offset,lv:level,ly:'A',smartGenerated:true,vsAuto:true,vsKind:'overall-x'});count++}
+  if(height>.05&&height<2000){S.dm.push({a:{x:xmin,y:ymin},b:{x:xmin,y:ymax},o:state.offset,lv:level,ly:'A',smartGenerated:true,vsAuto:true,vsKind:'overall-y'});count++}
  }
+ // Keep the older automatic object-text layer disabled: dense facade assemblies
+ // must not create one label per mesh block.
+ S.autoTags=false;
  if(typeof commit==='function')commit();
- if(typeof rq==='function')rq();
- if(typeof pr==='function')pr();
+ else {if(typeof rq==='function')rq();if(typeof pr==='function')pr()}
+ notice(`Auto Annotate: ${count} controlled dimension(s); ${old-S.dm.length+count} previous automatic dimension(s) replaced. Manual dimensions preserved.`);
+ return count;
 }
 function center(o){
  const pts=Array.isArray(o.pts)?o.pts:[];
@@ -4647,13 +4673,13 @@ texts=function(l){
  try{S.autoTags=false;values=baseTexts(l)}finally{S.autoTags=oldAuto}
  if(!state.tag)return values;
  const tagged=new Set(), occupied=[];
- const candidates=objects().filter(x=>x.lv===l&&typeAllowed(x));
+ const candidates=objects().filter(x=>x.lv===l&&typeAllowed(x)&&!x.generated&&!x.facadeId&&x.t!=='block');
  // Scaled model-space proximity prevents a stack of labels at shared geometry centers.
  for(const o of candidates){
   const c=center(o);if(!c)continue;
   if(!Number.isFinite(c[0])||!Number.isFinite(c[1]))continue;
-  if(occupied.some(p=>Math.abs(p[0]-c[0])<.75&&Math.abs(p[1]-c[1])<.38))continue;
-  if(occupied.length>=180)break;
+  if(occupied.some(p=>Math.abs(p[0]-c[0])<1.3&&Math.abs(p[1]-c[1])<.8))continue;
+  if(occupied.length>=35)break;
   occupied.push(c);
   const label=o.mark||o.id;
   const suffix=state.notes?notesOf(o):'';
@@ -4700,6 +4726,7 @@ function renderPanel(){
  <label><input id="sb-anno-tag" type="checkbox" ${state.tag?'checked':''}> Live object & assembly tags</label>
  <label><input id="sb-anno-notes" type="checkbox" ${state.notes?'checked':''}> Show specification notes</label>
  <label><input id="sb-anno-dim" type="checkbox" ${state.dim?'checked':''}> Generate linked dimensions</label>
+ <label>Dimension scope<select id="sb-anno-mode"><option value="overall" ${state.mode==='overall'?'selected':''}>Overall footprint (recommended)</option><option value="selected" ${state.mode==='selected'?'selected':''}>Selected elements only</option><option value="off" ${state.mode==='off'?'selected':''}>No automatic dimensions</option></select></label>
  <label>Dimension offset (m)<input id="sb-anno-offset" type="number" min=".1" max="2" step=".05" value="${state.offset}"></label>
  <div class="tb"><button id="sb-anno-build" type="button">Generate / refresh</button><button id="sb-anno-clear" type="button">Clear generated dimensions</button></div>
  <div class="tb"><button id="sb-anno-print" type="button">Print object schedule to sheet</button><button id="sb-anno-csv" type="button">Export object CSV</button></div>
@@ -4713,7 +4740,8 @@ const basePlot=plotPanel;
 plotPanel=function(){return renderPanel()+basePlot()};
 document.addEventListener('change',e=>{
  const id=e.target?.id;
- if(id==='sb-anno-tag')state.tag=e.target.checked;
+ if(id==='sb-anno-mode'){state.mode=e.target.value;state.tag=false;}
+ else if(id==='sb-anno-tag')state.tag=e.target.checked;
  else if(id==='sb-anno-notes')state.notes=e.target.checked;
  else if(id==='sb-anno-dim')state.dim=e.target.checked;
  else if(id==='sb-anno-offset')state.offset=Math.max(.1,Math.min(2,Number(e.target.value)||.55));
@@ -4722,15 +4750,15 @@ document.addEventListener('change',e=>{
 });
 document.addEventListener('click',e=>{
  const b=e.target.closest?.('button[id^="sb-anno-"]');if(!b)return;
- if(b.id==='sb-anno-build'){generate();notice('Updated '+entries().length+' object tags and associated dimensions')}
- if(b.id==='sb-anno-clear'){if(ready()){S.dm=S.dm.filter(d=>!d.smartGenerated);if(typeof commit==='function')commit();notice('Generated dimensions cleared')}}
+ if(b.id==='sb-anno-build'){generate();notice('Generated controlled dimensions; optional tags are filtered and limited')}
+ if(b.id==='sb-anno-clear'){if(ready()){S.dm=S.dm.filter(d=>!d.smartGenerated&&!d.auto&&!d.vsAuto);if(typeof commit==='function')commit();notice('Generated dimensions cleared')}}
  if(b.id==='sb-anno-print')printRegister();
  if(b.id==='sb-anno-csv')csv();
 });
 window.SketchBIMAnnotations={generate,entries,printRegister,exportCSV:csv};
 // Unify legacy Auto Annotate buttons with the current annotation engine.
 // Previous definitions generated a second dimension layer on top of smart dimensions.
-window.autoAnnotate=function(){try{S.autoTags=false;generate();notice('Annotations regenerated once; old duplicate auto-dimensions removed.')}catch(e){notice('Annotation error: '+e.message)}};
+window.autoAnnotate=function(){try{generate()}catch(e){notice('Annotation error: '+e.message);console.error(e)}};
 })();
 </script>
 

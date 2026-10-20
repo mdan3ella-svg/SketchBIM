@@ -4692,7 +4692,15 @@ window.SketchBIMImportFormats={mesh:['OBJ','STL'],underlay:['PNG','JPG','JPEG','
 const $id=id=>document.getElementById(id);
 const safe=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const PREF='vs.sketchbim.annotations.v2';
-const state={tag:true,notes:true,dim:true,types:'wall,beam,col,slab,roof,door,win,stair,room,block,route',offset:.55};
+const state={tag:true,notes:false,dim:true,types:'wall,beam,col,slab,roof,door,win,stair,room,block,route',offset:.85,preset:'architectural',tagGap:.55,tagStep:.34,dimStep:.4,paperScale:100};
+const PRESETS={architectural:{offset:.85,tagGap:.55,tagStep:.34,dimStep:.4},technical:{offset:1.1,tagGap:.75,tagStep:.42,dimStep:.5},presentation:{offset:1.5,tagGap:1.0,tagStep:.55,dimStep:.6},compact:{offset:.5,tagGap:.35,tagStep:.26,dimStep:.3}};
+const limits=(v,min,max,d)=>Number.isFinite(+v)?Math.max(min,Math.min(max,+v)):d;
+function projectStyle(){if(!S.docStyle||typeof S.docStyle!=='object')S.docStyle={};const d=S.docStyle;return d}
+function style(){const d=projectStyle();return {...state,...d,...(PRESETS[d.preset||state.preset]||PRESETS.architectural),...d};}
+function bounds(level){const pts=objects().filter(o=>o.lv===level).flatMap(o=>Array.isArray(o.pts)?o.pts:[]).filter(p=>Array.isArray(p)&&Number.isFinite(p[0])&&Number.isFinite(p[1]));if(!pts.length)return null;return {minX:Math.min(...pts.map(p=>p[0])),maxX:Math.max(...pts.map(p=>p[0])),minY:Math.min(...pts.map(p=>p[1])),maxY:Math.max(...pts.map(p=>p[1]))}}
+function sidePoint(c,b,side,gap){if(side==='right')return [b.maxX+gap,c[1]];if(side==='left')return [b.minX-gap,c[1]];if(side==='top')return [c[0],b.maxY+gap];return[c[0],b.minY-gap]}
+function closestSide(c,b){const options=[['left',Math.abs(c[0]-b.minX)],['right',Math.abs(b.maxX-c[0])],['top',Math.abs(b.maxY-c[1])],['bottom',Math.abs(c[1]-b.minY)]];options.sort((a,b)=>a[1]-b[1]);return options[0][0]}
+
 try{Object.assign(state,JSON.parse(localStorage.getItem(PREF)||'{}'))}catch(e){}
 function save(){try{localStorage.setItem(PREF,JSON.stringify(state))}catch(e){}}
 function ready(){return typeof S!=='undefined'&&Array.isArray(S.o)&&Array.isArray(S.dm)}
@@ -4714,6 +4722,7 @@ function dims(o){
 function generate(){
  if(!ready())return;
  S.dm=S.dm.filter(d=>!d.smartGenerated&&!d.auto);
+ const dimLanes=new Map();
  if(state.dim){
   for(const o of objects().filter(typeAllowed)){
    const ij=dims(o);if(!ij||!o.pts[ij[0]]||!o.pts[ij[1]])continue;
@@ -4722,8 +4731,15 @@ function generate(){
    const span=Math.hypot(b[0]-a[0],b[1]-a[1]);
    if(span<.04||span>10000)continue;
    if(S.dm.some(d=>d.a?.ref?.[0]===o.id&&d.b?.ref?.[0]===o.id))continue;
+   const cfg=style(),bnd=bounds(o.lv),c=center(o),nx=-(b[1]-a[1])/span,ny=(b[0]-a[0])/span;
+   const mid=[(a[0]+b[0])/2,(a[1]+b[1])/2];
+   const exterior=bnd?[mid[0]-(bnd.minX+bnd.maxX)/2,mid[1]-(bnd.minY+bnd.maxY)/2]:[nx,ny];
+   const sign=nx*exterior[0]+ny*exterior[1]>=0?1:-1;
+   const laneKey=(o.lv||0)+':' + (Math.abs(nx)>.7?(sign*nx>0?'E':'W'):(sign*ny>0?'N':'S'));
+   const lane=dimLanes.get(laneKey)||0;dimLanes.set(laneKey,lane+1);
+   const offset=sign*(limits(cfg.offset,.2,5,.85)+Math.min(lane,12)*limits(cfg.dimStep,.15,2,.4));
    S.dm.push({a:{x:a[0],y:a[1],ref:[o.id,ij[0]]},b:{x:b[0],y:b[1],ref:[o.id,ij[1]]},
-    o:Math.max(.1,Math.min(2,Number(state.offset)||.55)),lv:o.lv||0,ly:o.ly||'A',smartGenerated:true});
+    o:offset,lv:o.lv||0,ly:o.ly||'A',smartGenerated:true});
   }
  }
  if(typeof commit==='function')commit();
@@ -4754,23 +4770,35 @@ texts=function(l){
  let values;
  try{S.autoTags=false;values=baseTexts(l)}finally{S.autoTags=oldAuto}
  if(!state.tag)return values;
- const tagged=new Set(), occupied=[];
+ const cfg=style(),b=bounds(l),occupied={left:[],right:[],top:[],bottom:[]};
+ if(!b)return values;
  const candidates=objects().filter(x=>x.lv===l&&typeAllowed(x));
- // Scaled model-space proximity prevents a stack of labels at shared geometry centers.
+ const positions=[];
  for(const o of candidates){
   const c=center(o);if(!c)continue;
-  if(!Number.isFinite(c[0])||!Number.isFinite(c[1]))continue;
-  if(occupied.some(p=>Math.abs(p[0]-c[0])<.75&&Math.abs(p[1]-c[1])<.38))continue;
-  if(occupied.length>=180)break;
-  occupied.push(c);
-  const label=o.mark||o.id;
-  const suffix=state.notes?notesOf(o):'';
-  values.push({x:c[0]+.16,y:c[1]-.23,t:[label,descr(o),suffix].filter(Boolean).join(' | ').slice(0,86),
-     ly:o.ly||'A',ref:o.id,smartTag:true});
-  tagged.add(o.id);
+  const override=projectStyle().positions?.[o.id];
+  const side=override?.side||closestSide(c,b);
+  const isVertical=side==='left'||side==='right';
+  const gap=limits(cfg.tagGap,.15,6,.55),step=limits(cfg.tagStep,.15,2,.34);
+  const raw=sidePoint(c,b,side,gap);
+  const occupiedAxis=occupied[side];
+  let axis=(isVertical?raw[1]:raw[0]),iterations=0;
+  while(occupiedAxis.some(q=>Math.abs(q-axis)<step)&&iterations<300){axis+=(iterations%2?1:-1)*(Math.floor(iterations/2)+1)*step;iterations++}
+  occupiedAxis.push(axis);
+  let x=isVertical?raw[0]:axis,y=isVertical?axis:raw[1];
+  if(override){x=Number.isFinite(+override.x)?+override.x:x;y=Number.isFinite(+override.y)?+override.y:y}
+  const label=o.mark||o.id,suffix=state.notes?notesOf(o):'';
+  const text=[label,descr(o),suffix].filter(Boolean).join(' | ').slice(0,86);
+  positions.push({x,y,t:text,ly:(o.ly||'A')+'-TAG',ref:o.id,smartTag:true,leader:[c[0],c[1]]});
  }
+ values.push(...positions);
+
  return values;
 };
+
+const baseShapesForNotes=shapes;
+shapes=function(l){const res=baseShapesForNotes(l),tags=texts(l).filter(t=>t.smartTag&&Array.isArray(t.leader));for(const t of tags)res.push({p:[[t.leader[0],t.leader[1]],[t.x,t.y]],c:false,ly:(t.ly||'A')+'-LEADER',weight:.13});return res};
+
 function entries(){
  return objects().map(o=>{
   const ps=Array.isArray(o.pts)?o.pts:[];
@@ -4808,7 +4836,13 @@ function renderPanel(){
  <label><input id="sb-anno-tag" type="checkbox" ${state.tag?'checked':''}> Live object & assembly tags</label>
  <label><input id="sb-anno-notes" type="checkbox" ${state.notes?'checked':''}> Show specification notes</label>
  <label><input id="sb-anno-dim" type="checkbox" ${state.dim?'checked':''}> Generate linked dimensions</label>
- <label>Dimension offset (m)<input id="sb-anno-offset" type="number" min=".1" max="2" step=".05" value="${state.offset}"></label>
+ <label>Drafting style preset<select id="sb-anno-preset"><option value="architectural" ${style().preset==='architectural'?'selected':''}>Architectural / Working Drawing</option><option value="technical" ${style().preset==='technical'?'selected':''}>Technical / Coordination</option><option value="presentation" ${style().preset==='presentation'?'selected':''}>Presentation / Concept</option><option value="compact" ${style().preset==='compact'?'selected':''}>Compact / Review</option></select></label>
+ <label>Dimension first-lane offset (m)<input id="sb-anno-offset" type="number" min=".2" max="5" step=".05" value="${style().offset}"></label>
+ <label>Dimension lane spacing (m)<input id="sb-anno-dimstep" type="number" min=".15" max="2" step=".05" value="${style().dimStep}"></label>
+ <label>Tag clearance from plan (m)<input id="sb-anno-taggap" type="number" min=".15" max="6" step=".05" value="${style().tagGap}"></label>
+ <label>Tag row spacing (m)<input id="sb-anno-tagstep" type="number" min=".15" max="2" step=".05" value="${style().tagStep}"></label>
+ <p class="m">Tag positions can be adjusted for a selected model object. Offsets are project-specific and saved in native project JSON.</p>
+ <div class="tb"><button id="sb-anno-move-left" type="button">Tag ←</button><button id="sb-anno-move-right" type="button">Tag →</button><button id="sb-anno-move-up" type="button">Tag ↑</button><button id="sb-anno-move-down" type="button">Tag ↓</button><button id="sb-anno-reset-tag" type="button">Reset tag</button></div>
  <div class="tb"><button id="sb-anno-build" type="button">Generate / refresh</button><button id="sb-anno-clear" type="button">Clear generated dimensions</button></div>
  <div class="tb"><button id="sb-anno-print" type="button">Print object schedule to sheet</button><button id="sb-anno-csv" type="button">Export object CSV</button></div>
  <div class="m" id="sb-annot-status" role="status">${r.rows.length} model objects · ${r.grouped.length} assembly groups</div>
@@ -4824,12 +4858,26 @@ document.addEventListener('change',e=>{
  if(id==='sb-anno-tag')state.tag=e.target.checked;
  else if(id==='sb-anno-notes')state.notes=e.target.checked;
  else if(id==='sb-anno-dim')state.dim=e.target.checked;
- else if(id==='sb-anno-offset')state.offset=Math.max(.1,Math.min(2,Number(e.target.value)||.55));
+ else if(id==='sb-anno-preset'){const v=e.target.value;if(PRESETS[v]){Object.assign(projectStyle(),PRESETS[v],{preset:v});state.preset=v}}
+ else if(id==='sb-anno-offset')projectStyle().offset=limits(e.target.value,.2,5,.85);
+ else if(id==='sb-anno-dimstep')projectStyle().dimStep=limits(e.target.value,.15,2,.4);
+ else if(id==='sb-anno-taggap')projectStyle().tagGap=limits(e.target.value,.15,6,.55);
+ else if(id==='sb-anno-tagstep')projectStyle().tagStep=limits(e.target.value,.15,2,.34);
  else return;
  save();if(typeof rq==='function')rq();if(typeof pr==='function')pr();
 });
 document.addEventListener('click',e=>{
  const b=e.target.closest?.('button[id^="sb-anno-"]');if(!b)return;
+ if(/^sb-anno-(move-(left|right|up|down)|reset-tag)$/.test(b.id)){
+  if(!ready())return;const obj=typeof sels==='function'?sels()[0]:null;
+  if(!obj){notice('Select a model object to adjust its tag');return}
+  const ds=projectStyle();ds.positions=ds.positions||{};
+  if(b.id==='sb-anno-reset-tag')delete ds.positions[obj.id];
+  else {const c=center(obj),bb=bounds(obj.lv);if(!c||!bb)return;const side=closestSide(c,bb),p=ds.positions[obj.id]||{};
+   const raw=sidePoint(c,bb,side,style().tagGap);const dx=b.id.endsWith('left')?-.25:b.id.endsWith('right')?.25:0,dy=b.id.endsWith('up')?.25:b.id.endsWith('down')?-.25:0;
+   ds.positions[obj.id]={side,x:(Number.isFinite(+p.x)?+p.x:raw[0])+dx,y:(Number.isFinite(+p.y)?+p.y:raw[1])+dy};}
+  if(typeof commit==='function')commit();if(typeof rq==='function')rq();notice('Tag position updated');return;
+ }
  if(b.id==='sb-anno-build'){generate();notice('Updated '+entries().length+' object tags and associated dimensions')}
  if(b.id==='sb-anno-clear'){if(ready()){S.dm=S.dm.filter(d=>!d.smartGenerated);if(typeof commit==='function')commit();notice('Generated dimensions cleared')}}
  if(b.id==='sb-anno-print')printRegister();

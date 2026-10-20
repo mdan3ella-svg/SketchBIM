@@ -5311,7 +5311,7 @@ const panel=document.createElement('section');panel.id='ws-layout-panel';panel.h
 document.body.appendChild(panel);
 const q=id=>document.getElementById(id);
 function repaint(){try{if(typeof window.resize==='function')window.resize()}catch(_e){};window.dispatchEvent(new Event('resize'));try{window.requestAnimationFrame(()=>{if(typeof window.draw==='function')window.draw()})}catch(_e){}}
-let lastMode='';function apply(emit=true){
+let lastMode='';function apply(emit=true){if(document.body.classList.contains('vs-wf-focused'))return;
  cfg.left=clamp(cfg.left,78,220);cfg.right=clamp(cfg.right,240,460);
  document.documentElement.style.setProperty('--ws-left',cfg.left+'px');document.documentElement.style.setProperty('--ws-right',cfg.right+'px');
  const narrow=window.innerWidth<Math.max(960,cfg.left+cfg.right+460);
@@ -5319,9 +5319,9 @@ let lastMode='';function apply(emit=true){
  body.classList.toggle('ws-left-hidden',!cfg.showLeft);body.classList.toggle('ws-right-hidden',!cfg.showRight);
  body.classList.toggle('ws-drawer',mode==='drawer');body.classList.toggle('ws-floating',mode==='floating');body.classList.toggle('ws-compact',!!cfg.compact);
  if(mode!==lastMode){body.classList.remove('ws-drawer-open');lastMode=mode}
- q('ws-tools-toggle').setAttribute('aria-pressed',String(cfg.showLeft));q('ws-inspector-toggle').setAttribute('aria-pressed',String(cfg.showRight&&(mode!=='drawer'||body.classList.contains('ws-drawer-open'))));
- q('ws-left-size').value=cfg.left;q('ws-right-size').value=cfg.right;q('ws-dock').value=cfg.dock;q('ws-compact').checked=!!cfg.compact;
- q('ws-left-read').textContent=cfg.left+' px';q('ws-right-read').textContent=cfg.right+' px';
+ if(q('ws-tools-toggle'))q('ws-tools-toggle').setAttribute('aria-pressed',String(cfg.showLeft));if(q('ws-inspector-toggle'))q('ws-inspector-toggle').setAttribute('aria-pressed',String(cfg.showRight&&(mode!=='drawer'||body.classList.contains('ws-drawer-open'))));
+ if(q('ws-left-size'))q('ws-left-size').value=cfg.left;if(q('ws-right-size'))q('ws-right-size').value=cfg.right;if(q('ws-dock'))q('ws-dock').value=cfg.dock;if(q('ws-compact'))q('ws-compact').checked=!!cfg.compact;
+ if(q('ws-left-read'))q('ws-left-read').textContent=cfg.left+' px';if(q('ws-right-read'))q('ws-right-read').textContent=cfg.right+' px';
  try{localStorage.setItem(KEY,JSON.stringify(cfg))}catch(_e){}
  if(emit)repaint();
 }
@@ -5347,7 +5347,7 @@ body{grid-template-rows:48px minmax(0,1fr) 38px!important}
 #T #vs-wf-bar button:hover,#T #vs-wf-bar button[aria-selected=true]{background:#dceef1!important;color:#034f60!important;border-color:#a7cdd2!important}
 #vs-wf-actions{flex:0 0 auto;display:flex;gap:5px;align-items:center}
 #vs-wf-actions button{padding:6px 9px!important;min-height:32px!important;color:#123b47!important;background:#e9f3f5!important;border:1px solid #b4cfd5!important;border-radius:6px!important;font-weight:700!important;white-space:nowrap!important}
-#ws-layout-controls{display:none!important}
+#ws-layout-controls,#ws-layout-controls[hidden]{display:none!important}
 #vs-wf-menu{position:fixed!important;z-index:9000!important;top:52px!important;right:10px!important;width:min(435px,calc(100vw - 20px));max-height:min(72dvh,670px);overflow:auto;display:block;box-sizing:border-box;border:1px solid #b4c9ce;background:#fff;color:#183744;box-shadow:0 18px 45px #112d3c38;border-radius:10px;padding:12px}
 #vs-wf-menu[hidden]{display:none!important}
 #vs-wf-menu .vs-wf-group{display:flex;flex-wrap:wrap;align-items:center;gap:7px}
@@ -5389,7 +5389,7 @@ const tray=document.createElement('div');tray.id='vs-wf-menu';tray.hidden=true;t
 const sections={file:document.createElement('div'),view:document.createElement('div'),settings:document.createElement('div')};
 for(const [name,node] of Object.entries(sections)){node.className='vs-wf-group';node.id='vs-wf-'+name;node.hidden=true;tray.appendChild(node)}
 const classify=(el)=>{let id=el.id||'';if(['vb','rmd','sun','tg','sec','vs-refresh-viewport'].includes(id)||el.querySelector?.('#vb,#rmd,#sun,#tg,#sec,#vs-refresh-viewport'))return 'view';if(['ud','rd','sv','ld','op','fi','vs-standalone-tools','vs-quickfiles','fileMenuControl'].includes(id)||el.querySelector?.('#ud,#rd,#sv,#ld,#op,#fi,#vs-standalone-tools,#vs-quickfiles,#fileMenuControl'))return 'file';return 'settings'};
-for(const el of children){if(el===brand)continue;if(el.id==='ws-layout-controls'){el.remove();continue;}sections[classify(el)].appendChild(el)}
+for(const el of children){if(el===brand)continue;if(el.id==='ws-layout-controls'){el.hidden=true;document.body.appendChild(el);continue;}sections[classify(el)].appendChild(el)}
 const bar=document.createElement('nav');bar.id='vs-wf-bar';bar.setAttribute('aria-label','SketchBIM production workflows');
 const workflows=[['Draft','draft'],['Modify','modify'],['Model','model'],['Inspect','inspect'],['Annotate','annotate'],['Document','document']];
 for(const [label,key] of workflows){const b=document.createElement('button');b.type='button';b.textContent=label;b.dataset.workflow=key;b.setAttribute('aria-selected',String(key==='draft'));bar.appendChild(b)}

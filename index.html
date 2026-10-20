@@ -4721,26 +4721,80 @@ function dims(o){
 }
 function generate(){
  if(!ready())return;
+ // Keep manually authored dimensions; replace only earlier automatically generated dimensions.
  S.dm=S.dm.filter(d=>!d.smartGenerated&&!d.auto);
- const dimLanes=new Map();
  if(state.dim){
-  for(const o of objects().filter(typeAllowed)){
-   const ij=dims(o);if(!ij||!o.pts[ij[0]]||!o.pts[ij[1]])continue;
-   const a=o.pts[ij[0]],b=o.pts[ij[1]];
-   if(![a[0],a[1],b[0],b[1]].every(Number.isFinite))continue;
-   const span=Math.hypot(b[0]-a[0],b[1]-a[1]);
-   if(span<.04||span>10000)continue;
-   if(S.dm.some(d=>d.a?.ref?.[0]===o.id&&d.b?.ref?.[0]===o.id))continue;
-   const cfg=style(),bnd=bounds(o.lv),c=center(o),nx=-(b[1]-a[1])/span,ny=(b[0]-a[0])/span;
-   const mid=[(a[0]+b[0])/2,(a[1]+b[1])/2];
-   const exterior=bnd?[mid[0]-(bnd.minX+bnd.maxX)/2,mid[1]-(bnd.minY+bnd.maxY)/2]:[nx,ny];
-   const sign=nx*exterior[0]+ny*exterior[1]>=0?1:-1;
-   const laneKey=(o.lv||0)+':' + (Math.abs(nx)>.7?(sign*nx>0?'E':'W'):(sign*ny>0?'N':'S'));
-   const lane=dimLanes.get(laneKey)||0;dimLanes.set(laneKey,lane+1);
-   const offset=sign*(limits(cfg.offset,.2,5,.85)+Math.min(lane,12)*limits(cfg.dimStep,.15,2,.4));
-   S.dm.push({a:{x:a[0],y:a[1],ref:[o.id,ij[0]]},b:{x:b[0],y:b[1],ref:[o.id,ij[1]]},
-    o:offset,lv:o.lv||0,ly:o.ly||'A',smartGenerated:true});
+  const cfg=style(),first=limits(cfg.offset,.2,5,.85),step=limits(cfg.dimStep,.15,2,.4);
+  const eps=.012;
+  const wallSegments=objects().filter(o=>o.t==='wall'&&Array.isArray(o.pts)&&o.pts.length===2&&o.pts.every(p=>Array.isArray(p)&&p.slice(0,2).every(Number.isFinite)));
+  const levels=[...new Set(wallSegments.map(o=>o.lv))];
+  let count=0;
+  function add(a,b,off,lev,refs,kind){
+   if(![...a,...b,off].every(Number.isFinite)||Math.hypot(a[0]-b[0],a[1]-b[1])<.04)return;
+   const pt=(v,r)=>({x:v[0],y:v[1],...(r?{ref:r}:{})});
+   S.dm.push({a:pt(a,refs?.[0]),b:pt(b,refs?.[1]),o:off,lv:lev,ly:'A',smartGenerated:true,dimensionKind:kind});count++;
   }
+  for(const lev of levels){
+   const walls=wallSegments.filter(o=>o.lv===lev);
+   // Anchor to the wall/structure footprint, not room centroids or diagonal polygon vertices.
+   const P=walls.flatMap(w=>w.pts);if(P.length<2)continue;
+   const minX=Math.min(...P.map(p=>p[0])),maxX=Math.max(...P.map(p=>p[0]));
+   const minY=Math.min(...P.map(p=>p[1])),maxY=Math.max(...P.map(p=>p[1]));
+   const width=maxX-minX,height=maxY-minY;
+   if(!Number.isFinite(width)||!Number.isFinite(height)||width<=.04||height<=.04)continue;
+   const span=Math.max(width,height),tol=Math.max(.055,Math.min(.28,span*.012));
+   // Stable side-dependent dimension normals: east-going -> south with negative offset;
+   // north-going -> west with positive offset. All offsets are model metres.
+   const sides=[
+    {name:'S',axis:0,edge:minY,dir:1,normal:-1,base:minY},
+    {name:'N',axis:0,edge:maxY,dir:1,normal:1,base:maxY},
+    {name:'W',axis:1,edge:minX,dir:-1,normal:1,base:minX},
+    {name:'E',axis:1,edge:maxX,dir:-1,normal:-1,base:maxX}
+   ];
+   function outerRefs(axis,low,high){
+    const candidates=walls.flatMap(w=>w.pts.map((p,i)=>({p,r:[w.id,i]})));
+    const lo=candidates.filter(v=>Math.abs(v.p[axis]-low)<eps)[0];
+    const hi=candidates.filter(v=>Math.abs(v.p[axis]-high)<eps)[0];
+    return lo&&hi?[lo.r,hi.r]:null;
+   }
+   for(const side of sides){
+    const vertical=side.axis===1;
+    // Exterior wall segments only. Interior walls, beams, columns, rooms and stairs
+    // are deliberately omitted from automatic dimension strings.
+    const matches=[];
+    for(const w of walls){
+     const [u,v]=w.pts,dx=v[0]-u[0],dy=v[1]-u[1];
+     if(vertical?Math.abs(dx)>tol:Math.abs(dy)>tol)continue;
+     const edge=vertical?(u[0]+v[0])/2:(u[1]+v[1])/2;
+     if(Math.abs(edge-side.edge)>tol)continue;
+     const i=vertical?1:0,lo=u[i]<=v[i]?{p:u,r:[w.id,0]}:{p:v,r:[w.id,1]},hi=u[i]<=v[i]?{p:v,r:[w.id,1]}:{p:u,r:[w.id,0]};
+     if(hi.p[i]-lo.p[i]>.04)matches.push({lo,hi});
+    }
+    // Never generate unbounded chains on dense façades; 16 segments/side is a
+    // deliberate legibility limit; overall dimensions are always retained.
+    matches.sort((a,b)=>a.lo.p[side.axis]-b.lo.p[side.axis]);
+    const unique=[];const seen=new Set();
+    for(const m of matches){const key=[m.lo.p[side.axis],m.hi.p[side.axis]].map(v=>Math.round(v*100)).join(':');if(seen.has(key))continue;seen.add(key);unique.push(m)}
+    const createChain=unique.length>=2&&unique.length<=16;
+    if(createChain){
+     for(const m of unique){
+      const offset=vertical?side.normal*first:side.normal*first;
+      // Orient every segment low->high, giving north / west-pointing left normals.
+      const offsetSigned=offset;
+      add(m.lo.p,m.hi.p,offsetSigned,lev,[m.lo.r,m.hi.r],'exterior-chain');
+     }
+    }
+    const overallOffset=first+(createChain?step:0);
+    let A,B;
+    if(vertical){A=[side.edge,minY];B=[side.edge,maxY]}
+    else{A=[minX,side.edge];B=[maxX,side.edge]}
+    const signed=side.normal*overallOffset;
+    // When the drawing is asymmetric, opposite-side dimensions improve review but
+    // each side has only one overall string. They never stack per model object.
+    add(A,B,signed,lev,null,'overall');
+   }
+  }
+  if(typeof msg==='function')msg('Generated '+count+' ordered exterior dimensions; interior object clutter omitted.');
  }
  if(typeof commit==='function')commit();
  if(typeof rq==='function')rq();
@@ -4835,7 +4889,7 @@ function renderPanel(){
  <p class="m">Model-linked annotations, object specifications and sheet-ready schedules.</p>
  <label><input id="sb-anno-tag" type="checkbox" ${state.tag?'checked':''}> Live object & assembly tags</label>
  <label><input id="sb-anno-notes" type="checkbox" ${state.notes?'checked':''}> Show specification notes</label>
- <label><input id="sb-anno-dim" type="checkbox" ${state.dim?'checked':''}> Generate linked dimensions</label>
+ <label><input id="sb-anno-dim" type="checkbox" ${state.dim?'checked':''}> Generate exterior chains + overall dimensions</label>
  <label>Drafting style preset<select id="sb-anno-preset"><option value="architectural" ${style().preset==='architectural'?'selected':''}>Architectural / Working Drawing</option><option value="technical" ${style().preset==='technical'?'selected':''}>Technical / Coordination</option><option value="presentation" ${style().preset==='presentation'?'selected':''}>Presentation / Concept</option><option value="compact" ${style().preset==='compact'?'selected':''}>Compact / Review</option></select></label>
  <label>Dimension first-lane offset (m)<input id="sb-anno-offset" type="number" min=".2" max="5" step=".05" value="${style().offset}"></label>
  <label>Dimension lane spacing (m)<input id="sb-anno-dimstep" type="number" min=".15" max="2" step=".05" value="${style().dimStep}"></label>
@@ -4846,7 +4900,7 @@ function renderPanel(){
  <div class="tb"><button id="sb-anno-build" type="button">Generate / refresh</button><button id="sb-anno-clear" type="button">Clear generated dimensions</button></div>
  <div class="tb"><button id="sb-anno-print" type="button">Print object schedule to sheet</button><button id="sb-anno-csv" type="button">Export object CSV</button></div>
  <div class="m" id="sb-annot-status" role="status">${r.rows.length} model objects · ${r.grouped.length} assembly groups</div>
- <p class="m">Dimensions follow indexed model vertices; reference dimensions for complex objects are approximate. Printed registers use the selected Plot paper and orientation.</p>
+ <p class="m">Automatic dimensions measure exterior wall runs and overall building extents in model metres. Review unusual footprints and place interior dimensions manually. Printed registers use the selected Plot paper and orientation.</p>
  </section>`;
 }
 const baseSchedule=pS;

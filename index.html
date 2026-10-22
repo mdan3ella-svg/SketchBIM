@@ -5860,4 +5860,68 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&dock.open){dock.ope
 window.SketchBIMRestoredTools=()=>({panels:UI_TABS.map(t=>t[1]),specialty:[...dock.querySelectorAll('button')].filter(n=>n.id).map(n=>n.id)});
 }if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount,{once:true});else mount()})();
 </script>
-</body></html>
+<style>/* Floating editors must be above the dock and leave the drawing available for selection. */
+body .specialty-panel[data-specialty-active]{position:fixed!important;inset:92px 10px 70px auto!important;width:min(430px,calc(100vw - 20px))!important;min-width:0!important;height:auto!important;max-height:calc(100dvh - 162px)!important;max-width:calc(100vw - 20px)!important;z-index:2147483600!important;overflow:auto!important;pointer-events:auto!important;opacity:1!important;transform:none!important;box-sizing:border-box!important;border:1px solid #9bbbc4!important;background:#f8fbfb!important;color:#203e48!important;border-radius:10px!important;padding:12px!important;box-shadow:0 12px 40px #17374733!important}
+body #vs-group-panel[data-specialty-active]{width:min(850px,calc(100vw - 20px))!important}
+.specialty-panel-header{display:flex;align-items:center;gap:6px;position:sticky;top:-12px;z-index:30;background:#e7f1f4;border-bottom:1px solid #afc9d1;padding:10px 4px;margin-bottom:10px}
+.specialty-panel-header strong{flex:1;min-width:0;font:700 13px system-ui}
+.specialty-panel .specialty-panel-header button{width:auto!important;flex:none!important;margin:0!important;padding:7px!important;font:600 12px system-ui!important;color:#153d49!important;background:white!important;border:1px solid #a9c5cd!important;border-radius:5px!important;cursor:pointer!important}
+.specialty-panel[hidden]{display:none!important}
+@media(max-width:700px){body .specialty-panel[data-specialty-active]{inset:92px 6px 70px auto!important;width:calc(100vw - 12px)!important;max-width:calc(100vw - 12px)!important}#vs-group-panel .vs-cols{grid-template-columns:1fr!important}}
+</style><script>/* One visibility owner for specialty tools; original actions remain authoritative. */
+(function(){
+'use strict';
+function init(){
+ const specs=[
+ ['facade','vs-facade-shortcut','forge-facade-panel','Facade Generator'],
+ ['joins','forgeJoinLauncher','forgeJoinPanel','Wall Joints'],
+ ['walls','forge-wall-btn','forge-wall-panel','Wall Assemblies'],
+ ['roof','forgeRoofLauncher','forgeRoofPanel','Roof Designer'],
+ ['int','itd-launch','itd-panel','Interior Technical Design'],
+ ['library','forgeIntButton','forgeIntPanel','Object Library'],
+ ['grid','vsg-launch','vs-smartgrid','Structural Grid & Frame'],
+ ['layers','forgeSubLayerLauncher','forgeSubLayerPanel','Discipline Sublayers'],
+ ['edit','forgeLayerLauncher','forgeLayerPanel','Layer Editor'],
+ ['groups','vs-group-open','vs-group-panel','Groups, Arrays & Delivery'],
+ ['components','vs-component-launch','vs-component-editor','Custom Furniture & Components']
+ ];
+ const dock=document.getElementById('vs-advanced-dock');let active=null,dispatching=false;
+ const records=specs.map(([key,buttonId,panelId,title])=>({key,button:document.getElementById(buttonId),panel:document.getElementById(panelId),title})).filter(r=>r.button&&r.panel);
+ function hide(r){r.panel.hidden=true;r.panel.classList.remove('open');r.panel.style.display='none';r.panel.removeAttribute('data-specialty-active');r.button.setAttribute('aria-expanded','false')}
+ function close(focus=true){const r=active;active=null;if(r){hide(r);if(focus)document.getElementById('restored-specialty')?.focus({preventScroll:true})}}
+ function open(key){const r=records.find(r=>r.key===key);if(!r)return false;
+ close(false);for(const other of records)if(other!==r)hide(other);
+ // Start from a closed state so native toggle handlers always perform their open/refresh action.
+ hide(r);r.panel.hidden=false;r.panel.style.removeProperty('display');
+ dispatching=true;try{r.button.click()}finally{dispatching=false}
+ dock.open=false;document.getElementById('vs-wf-menu')?.setAttribute('hidden','');
+ // Normalize all three legacy states after the native initializer has populated its controls.
+ r.panel.hidden=false;r.panel.classList.add('open');r.panel.style.display=r.key==='groups'?'flex':'block';r.panel.style.visibility='visible';r.panel.setAttribute('data-specialty-active','true');r.button.setAttribute('aria-expanded','true');active=r;
+ r.panel.scrollTop=0;r.panel.querySelector('.specialty-close')?.focus({preventScroll:true});if(key==='joins')refreshJoin();return true;
+ }
+ for(const r of records){
+ document.body.appendChild(r.panel);r.panel.classList.add('specialty-panel');r.panel.setAttribute('aria-label',r.title);r.button.setAttribute('aria-controls',r.panel.id);r.button.setAttribute('aria-expanded','false');
+ const bar=document.createElement('div');bar.className='specialty-panel-header';const title=document.createElement('strong');title.textContent=r.title;const back=document.createElement('button');back.type='button';back.textContent='All tools';back.onclick=()=>{close(false);dock.open=true;document.getElementById('restored-specialty')?.focus()};const done=document.createElement('button');done.type='button';done.className='specialty-close';done.textContent='Close';done.setAttribute('aria-label','Close '+r.title);done.onclick=()=>close();bar.append(title,back,done);r.panel.prepend(bar);
+ r.button.addEventListener('click',e=>{if(dispatching)return;e.preventDefault();e.stopImmediatePropagation();open(r.key)},true);
+ hide(r);
+ new MutationObserver(()=>{if(active===r&&(r.panel.hidden||r.panel.style.display==='none'||!r.panel.classList.contains('open')))close(false)}).observe(r.panel,{attributes:true,attributeFilter:['class','hidden','style']});
+ }
+ // Legacy cascade links use the same path instead of maintaining competing active-panel state.
+ window.forgeCascadeOpen=key=>dispatching?undefined:open(key);
+ window.forgeOpenFacade=()=>open('facade');window.forgeCloseFacade=()=>close();
+ document.getElementById('restored-specialty')?.addEventListener('click',()=>close(false),true);
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&active){close();e.preventDefault()}},true);
+ // Native close controls may toggle classes, hidden, or inline styles; honor all of them.
+ document.addEventListener('click',e=>{if(!active)return;const b=e.target.closest('button');if(!b||!active.panel.contains(b)||b.closest('.specialty-panel-header'))return;if(/^(?:×|✕|✖|close|dismiss)(?:\s|$)/i.test(b.textContent.trim()))close(false)});
+ const joinStatus=document.getElementById('forgeJoinStatus'),apply=document.getElementById('forgeJoinApply');
+ function selectedWall(){const objects=sel.map(find).filter(Boolean);return objects.length===1&&objects[0].t==='wall'?objects[0]:null}
+ let joinSelection=null;
+ function refreshJoin(){const w=selectedWall();apply.disabled=!w||objectLocked(w);if(!w){joinSelection=null;joinStatus.textContent='Select exactly one wall in the drawing, then set its start and finish joints.';return}{document.getElementById('forgeJoinStart').value=w.joinStart||'auto';document.getElementById('forgeJoinEnd').value=w.joinEnd||'auto';joinSelection=w.id}joinStatus.textContent=objectLocked(w)?'Layer locked: unlock this wall before editing.':w.id+' · '+len(w).toFixed(2)+' m · '+Math.round(w.th*1000)+' mm thick'}
+ apply.onclick=()=>{const w=selectedWall();if(!w||objectLocked(w)){refreshJoin();return}const a=document.getElementById('forgeJoinStart').value,b=document.getElementById('forgeJoinEnd').value;if(![a,b].every(v=>['auto','miter','butt','square'].includes(v))){joinStatus.textContent='Choose a valid joint rule.';return}const result=transaction(()=>{w.joinStart=a;w.joinEnd=b;return true});joinStatus.textContent=result?'Joint rules applied to '+w.id+'. Use Undo to revert.':'Joint change rejected. Check the command status.';dirty=1;rq()};
+ const priorPr=pr;pr=function(){priorPr();if(active?.key==='joins')refreshJoin()};
+ document.getElementById('c2')?.addEventListener('pointerup',()=>{if(active?.key==='joins')queueMicrotask(refreshJoin)});
+ window.SketchBIMSpecialty={open,close,get active(){return active?.key||null},tools:specs.map(s=>s[0])};
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+})();
+</script></body></html>
